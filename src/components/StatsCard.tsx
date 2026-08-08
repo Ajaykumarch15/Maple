@@ -13,7 +13,7 @@ export default function StatsCard({
 }: StatsCardProps) {
   return (
     <div
-      className="card animate-rise p-6"
+      className="card card-hover animate-rise p-6"
       style={{ animationDelay: `${delay}ms` }}
     >
       <p className="eyebrow">{label}</p>

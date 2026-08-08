@@ -1,8 +1,18 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { useTheme } from "../theme";
 import { NAV_ITEMS } from "./nav";
 import { MoonIcon, PlusIcon, SunIcon } from "./icons";
+
+function AmbientBackground() {
+  return (
+    <div className="ambient-bg" aria-hidden="true">
+      <div className="ambient-blob ambient-blob--a" />
+      <div className="ambient-blob ambient-blob--b" />
+      <div className="absolute inset-0 ambient-noise" />
+    </div>
+  );
+}
 
 function MobileTopBar() {
   const { theme, toggleTheme } = useTheme();
@@ -62,12 +72,18 @@ function MobileTopBar() {
 }
 
 export default function Layout() {
+  const location = useLocation();
+
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen">
+      <AmbientBackground />
       <Sidebar />
       <MobileTopBar />
       <main className="lg:pl-[264px]">
-        <div className="mx-auto max-w-[1060px] px-5 py-8 sm:px-8 lg:px-10 lg:py-12">
+        <div
+          key={location.pathname}
+          className="page-enter mx-auto max-w-[1060px] px-5 py-8 sm:px-8 lg:px-10 lg:py-12"
+        >
           <Outlet />
         </div>
       </main>

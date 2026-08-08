@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useQuotes } from "../store/quotes";
 import QuoteCard from "../components/QuoteCard";
 import EmptyState from "../components/EmptyState";
+import Loader from "../components/Loader";
 import { useDebounce } from "../utils/useDebounce";
 import { SOURCE_TYPES } from "../types";
 import type { QuoteQueryParams, SourceType } from "../types";
@@ -71,7 +72,7 @@ function FilterMenu({ label, icon, options, selected, onSelect }: FilterMenuProp
       </button>
 
       {open && (
-        <div className="absolute left-0 top-full z-30 mt-2 max-h-80 w-72 overflow-y-auto rounded-2xl border border-border bg-card p-2 shadow-[0_28px_64px_-24px_rgba(36,33,29,0.42)]">
+        <div className="animate-pop absolute left-0 top-full z-30 mt-2 max-h-80 w-72 overflow-y-auto rounded-2xl border border-border bg-card p-2 shadow-pop">
           {options.length === 0 ? (
             <p className="px-3 py-3 text-[13px] text-ink-faint">Nothing here yet.</p>
           ) : (
@@ -83,7 +84,7 @@ function FilterMenu({ label, icon, options, selected, onSelect }: FilterMenuProp
                   onSelect(selected === opt ? undefined : opt);
                   setOpen(false);
                 }}
-                className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-[13px] transition ${
+                className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left text-[13px] transition-colors duration-150 ${
                   selected === opt
                     ? "bg-accent-soft font-medium text-accent-deep"
                     : "text-ink-soft hover:bg-card hover:text-ink"
@@ -101,7 +102,7 @@ function FilterMenu({ label, icon, options, selected, onSelect }: FilterMenuProp
                 onSelect(undefined);
                 setOpen(false);
               }}
-              className="mt-1 flex w-full items-center gap-2 rounded-xl border-t border-border px-3 py-2 text-left text-[13px] text-ink-soft transition hover:text-ink"
+              className="mt-1 flex w-full items-center gap-2 rounded-xl border-t border-border px-3 py-2 text-left text-[13px] text-ink-soft transition-colors duration-150 hover:text-ink"
             >
               <XIcon className="h-3.5 w-3.5" /> Clear {label.toLowerCase()}
             </button>
@@ -290,14 +291,14 @@ export default function LibraryPage() {
 
   const emptyLibrary = total === 0 && activeCount === 0;
   const emptyTitle = emptyLibrary
-    ? "Your library is empty."
+    ? "Nothing here yet."
     : view === "favorites"
       ? "No favorites yet."
       : collection
         ? "This collection is waiting for its first line."
         : "No lines found.";
   const emptyBody = emptyLibrary
-    ? "Save a line worth keeping and it will appear here."
+    ? "Start keeping the lines you don't want to lose — your first save will appear here."
     : view === "favorites"
       ? "Tap the heart on any quote to keep it close."
       : collection
@@ -330,8 +331,8 @@ export default function LibraryPage() {
       </header>
 
       <div className="animate-rise mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-faint" />
+        <div className="group relative flex-1">
+          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-faint transition-colors duration-200 group-focus-within:text-accent" />
           <input
             type="text"
             value={query}
@@ -562,24 +563,27 @@ export default function LibraryPage() {
       )}
 
       {loading ? (
-        <div className="card mt-8 flex items-center justify-center py-24">
-          <p className="font-serif text-xl text-ink-soft">
-            Gathering your lines…
-          </p>
+        <div className="card mt-8">
+          <Loader copy="Gathering your lines…" />
         </div>
       ) : quotes.length > 0 ? (
         <>
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {quotes.map((quote) => (
-              <QuoteCard
+            {quotes.map((quote, i) => (
+              <div
                 key={quote.id}
-                quote={quote}
-                onToggleFavorite={(id) => {
-                  toggleFavorite(id).catch((err) =>
-                    console.error("Failed to toggle favorite", err),
-                  );
-                }}
-              />
+                className="animate-card-in"
+                style={{ animationDelay: `${Math.min(i, 11) * 45}ms` }}
+              >
+                <QuoteCard
+                  quote={quote}
+                  onToggleFavorite={(id) => {
+                    toggleFavorite(id).catch((err) =>
+                      console.error("Failed to toggle favorite", err),
+                    );
+                  }}
+                />
+              </div>
             ))}
           </div>
           <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/80 pt-6 sm:flex-row">

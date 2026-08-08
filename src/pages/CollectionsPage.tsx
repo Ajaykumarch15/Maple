@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useQuotes } from "../store/quotes";
 import EmptyState from "../components/EmptyState";
+import Loader from "../components/Loader";
 import { CollectionsIcon, ArrowRightIcon } from "../components/icons";
 
 export default function CollectionsPage() {
@@ -15,10 +16,8 @@ export default function CollectionsPage() {
             Collections
           </h1>
         </header>
-        <div className="card mt-10 flex items-center justify-center py-24">
-          <p className="font-serif text-xl text-ink-soft">
-            Gathering your threads…
-          </p>
+        <div className="card mt-10">
+          <Loader copy="Gathering your threads…" />
         </div>
       </div>
     );
@@ -47,28 +46,36 @@ export default function CollectionsPage() {
             <Link
               key={entry.name}
               to={`/library?collection=${encodeURIComponent(entry.name)}`}
-              className="card group flex flex-col p-7 transition-all duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[0_16px_44px_-20px_rgba(36,33,29,0.28)]"
-              style={{ animationDelay: `${i * 40}ms` }}
+              className="card card-hover animate-card-in group relative flex h-full flex-col overflow-hidden p-7 hover:border-border-strong"
+              style={{ animationDelay: `${Math.min(i, 7) * 50}ms` }}
             >
-              <div className="flex items-center justify-between gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent-deep">
+              <div
+                className="pointer-events-none absolute -left-14 -top-14 h-44 w-44 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
+                style={{
+                  background:
+                    "radial-gradient(circle, rgba(112,138,129,0.16), transparent 65%)",
+                }}
+                aria-hidden="true"
+              />
+              <div className="relative flex items-center justify-between gap-3">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent-deep transition-all duration-300 group-hover:-rotate-6 group-hover:scale-105 group-hover:shadow-[0_8px_20px_-8px_rgba(112,138,129,0.5)]">
                   <CollectionsIcon className="h-5 w-5" />
                 </span>
                 <span className="eyebrow">
                   {entry.count} {entry.count === 1 ? "line" : "lines"}
                 </span>
               </div>
-              <h2 className="mt-5 font-serif text-[26px] tracking-tight text-ink">
+              <h2 className="relative mt-5 font-serif text-[26px] tracking-tight text-ink">
                 {entry.name}
               </h2>
               {entry.preview && (
-                <p className="mt-3 line-clamp-2 font-cormorant text-[18px] italic leading-relaxed text-ink-soft">
+                <p className="relative mt-3 line-clamp-2 font-cormorant text-[18px] italic leading-relaxed text-ink-soft transition-transform duration-300 group-hover:translate-x-px">
                   “{entry.preview}”
                 </p>
               )}
-              <div className="mt-6 flex items-center gap-1.5 border-t border-border/80 pt-4 text-sm text-ink-soft transition group-hover:text-accent-deep">
+              <div className="relative mt-6 flex items-center gap-1.5 border-t border-border/80 pt-4 text-sm text-ink-soft transition-colors duration-300 group-hover:text-accent-deep">
                 Open collection
-                <ArrowRightIcon className="h-4 w-4" />
+                <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
               </div>
             </Link>
           ))}
@@ -76,8 +83,8 @@ export default function CollectionsPage() {
       ) : (
         <div className="mt-10">
           <EmptyState
-            title="No collections yet."
-            body="Group saved lines into collections as you go — by mood, by book, by season."
+            title="Your themes are waiting."
+            body="A collection begins with a line worth keeping — save one and gather its companions here."
             ctaLabel="Save your first line"
             ctaTo="/add"
           />

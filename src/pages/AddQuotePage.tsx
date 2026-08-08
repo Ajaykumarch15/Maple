@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuotes } from "../store/quotes";
 import { SOURCE_TYPES } from "../types";
 import type { Quote, SourceType } from "../types";
-import { PlusIcon, XIcon } from "../components/icons";
+import Loader from "../components/Loader";
+import { CheckIcon, PlusIcon, XIcon } from "../components/icons";
 
 const CURATED_TAGS = [
   "on-writing",
@@ -36,6 +37,8 @@ export default function AddQuotePage() {
   const [tagInput, setTagInput] = useState("");
   const [collection, setCollection] = useState("");
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const close = () => navigate(-1);
 
@@ -112,8 +115,10 @@ export default function AddQuotePage() {
       setError("A quote needs at least one line worth keeping.");
       return;
     }
+    setSaving(true);
+    setError("");
     try {
-      const saved = await addQuote(
+      const savedQuote = await addQuote(
         {
           text: text.trim(),
           sourceType,
@@ -125,17 +130,21 @@ export default function AddQuotePage() {
         },
         editId ?? undefined,
       );
-      navigate(`/quotes/${saved.id}`);
+      setSaved(true);
+      window.setTimeout(() => navigate(`/quotes/${savedQuote.id}`), 650);
     } catch (err) {
       console.error("Failed to save quote", err);
+      setSaving(false);
       setError(
         "Couldn't reach the server. Check that the API is running (npm run dev).",
       );
     }
   };
 
+  const confirmationCopy = editing ? "Changes saved to Maple" : "Saved to Maple";
+
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-[3px]">
+    <div className="animate-fade fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-[3px]">
       <div
         className="flex min-h-full items-start justify-center p-4 sm:p-8"
         onClick={close}
@@ -169,10 +178,20 @@ export default function AddQuotePage() {
           </div>
 
           {!formReady ? (
-            <div className="flex items-center justify-center py-24">
-              <p className="font-serif text-lg text-ink-soft">
-                Lifting this entry…
-              </p>
+            <Loader copy="Lifting this entry…" className="py-10" />
+          ) : saved ? (
+            <div className="flex flex-col items-center gap-6 px-8 py-20 text-center">
+              <span className="saved-check">
+                <CheckIcon className="h-6 w-6" />
+              </span>
+              <div>
+                <p className="font-serif text-[26px] tracking-tight text-ink">
+                  {confirmationCopy}
+                </p>
+                <p className="mt-2 text-[13px] text-ink-soft">
+                  This line is now part of your commonplace book.
+                </p>
+              </div>
             </div>
           ) : (
             <>
@@ -348,12 +367,13 @@ export default function AddQuotePage() {
                     : "Saved privately to your commonplace book."}
                 </p>
                 <div className="grid w-full grid-cols-2 gap-3 sm:flex sm:w-auto sm:items-center sm:gap-3">
-                  <button type="button" onClick={close} className="btn-ghost">
+                  <button type="button" onClick={close} className="btn-ghost" disabled={saving}>
                     Discard
                   </button>
                   <button
                     type="button"
                     onClick={handleSave}
+                    disabled={saving}
                     className="btn-primary"
                   >
                     <PlusIcon className="h-4 w-4" />

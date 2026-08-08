@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useQuotes } from "../store/quotes";
 import SourceChip from "../components/SourceChip";
 import EmptyState from "../components/EmptyState";
+import Loader from "../components/Loader";
 import { ArrowRightIcon } from "../components/icons";
 import { formatShort } from "../utils/format";
 import type { Quote } from "../types";
@@ -38,10 +39,8 @@ export default function ReflectionsPage() {
             Reflections
           </h1>
         </header>
-        <div className="card mt-10 flex items-center justify-center py-24">
-          <p className="font-serif text-xl text-ink-soft">
-            Gathering your notes…
-          </p>
+        <div className="card mt-10">
+          <Loader copy="Gathering your notes…" />
         </div>
       </div>
     );
@@ -64,39 +63,60 @@ export default function ReflectionsPage() {
 
       {withReflection.length > 0 ? (
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {withReflection.map((q) => (
-            <Link
+          {withReflection.map((q, i) => (
+            <div
               key={q.id}
-              to={`/quotes/${q.id}`}
-              className="card group flex flex-col p-7 transition-all duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[0_16px_44px_-20px_rgba(36,33,29,0.28)]"
+              className="animate-card-in"
+              style={{ animationDelay: `${Math.min(i, 7) * 50}ms` }}
             >
-              <div className="flex items-center justify-between gap-3">
-                <SourceChip type={q.sourceType} />
-                <span className="text-[11px] tracking-wide text-ink-faint">
-                  {formatShort(q.savedDate)}
-                </span>
-              </div>
+              <Link
+                to={`/quotes/${q.id}`}
+                className="card card-hover group relative flex h-full flex-col overflow-hidden p-7 hover:border-rose/40"
+              >
+                <div
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    background:
+                      "radial-gradient(110% 90% at 15% 0%, rgba(176,103,95,0.07), transparent 55%), radial-gradient(100% 80% at 100% 100%, rgba(169,132,61,0.06), transparent 55%)",
+                  }}
+                  aria-hidden="true"
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                  style={{
+                    background:
+                      "radial-gradient(110% 90% at 15% 0%, rgba(176,103,95,0.14), transparent 55%)",
+                  }}
+                  aria-hidden="true"
+                />
+                <div className="relative flex items-center justify-between gap-3">
+                  <SourceChip type={q.sourceType} />
+                  <span className="text-[11px] tracking-wide text-ink-faint">
+                    {formatShort(q.savedDate)}
+                  </span>
+                </div>
 
-              <p className="mt-5 font-cormorant text-[21px] italic leading-[1.55] text-ink">
-                “{q.reflection}”
-              </p>
+                <p className="relative mt-6 font-cormorant text-[22px] italic leading-[1.55] text-ink">
+                  “{q.reflection}”
+                </p>
 
-              <div className="mt-auto pt-6">
-                <p className="line-clamp-2 font-serif text-[16px] leading-relaxed text-ink-soft">
-                  — {q.author ?? q.work ?? "Untitled"}
-                </p>
-                <p className="mt-4 inline-flex items-center gap-1.5 border-t border-border/80 pt-4 text-sm text-ink-soft transition group-hover:text-accent-deep">
-                  Read the entry
-                  <ArrowRightIcon className="h-4 w-4" />
-                </p>
-              </div>
-            </Link>
+                <div className="relative mt-auto pt-6">
+                  <p className="line-clamp-2 font-serif text-[16px] leading-relaxed text-ink-soft">
+                    — {q.author ?? q.work ?? "Untitled"}
+                  </p>
+                  <p className="mt-4 inline-flex items-center gap-1.5 border-t border-border/80 pt-4 text-sm text-ink-soft transition-colors duration-300 group-hover:text-accent-deep">
+                    Read the entry
+                    <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </p>
+                </div>
+              </Link>
+            </div>
           ))}
         </div>
       ) : (
         <div className="mt-10">
           <EmptyState
-            title="Nothing reflected yet."
+            title="Leave a thought beside the words."
             body="When a line stops you, add a sentence about why. Those notes are what make the archive yours."
             ctaLabel="New save"
             ctaTo="/add"

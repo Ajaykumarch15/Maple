@@ -4,6 +4,7 @@ import { useQuotes } from "../store/quotes";
 import QuoteCard from "../components/QuoteCard";
 import StatsCard from "../components/StatsCard";
 import ResurfaceCard from "../components/ResurfaceCard";
+import Loader from "../components/Loader";
 import {
   PlusIcon,
   ShuffleIcon,
@@ -58,10 +59,8 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className="card flex items-center justify-center py-24">
-        <p className="font-serif text-xl text-ink-soft">
-          Gathering your lines…
-        </p>
+      <div className="card">
+        <Loader copy="Gathering your lines…" />
       </div>
     );
   }
@@ -88,11 +87,11 @@ export default function HomePage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <Link to="/rediscover" className="btn-ghost">
-            <ShuffleIcon className="h-4 w-4" />
+          <Link to="/rediscover" className="btn-ghost group">
+            <ShuffleIcon className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
             Rediscover a line
           </Link>
-          <Link to="/add" className="btn-primary">
+          <Link to="/add" className="btn-primary group">
             <PlusIcon className="h-4 w-4" />
             New save
           </Link>
@@ -152,15 +151,21 @@ export default function HomePage() {
           </div>
           <Link
             to="/library"
-            className="inline-flex items-center gap-1.5 text-sm text-ink-soft transition hover:text-accent-deep"
+            className="group inline-flex items-center gap-1.5 text-sm text-ink-soft transition-colors duration-200 hover:text-accent-deep"
           >
             View library
-            <ArrowRightIcon className="h-4 w-4" />
+            <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {recent.map((quote) => (
-            <QuoteCard key={quote.id} quote={quote} />
+          {recent.map((quote, i) => (
+            <div
+              key={quote.id}
+              className="animate-card-in"
+              style={{ animationDelay: `${Math.min(i, 7) * 60}ms` }}
+            >
+              <QuoteCard quote={quote} />
+            </div>
           ))}
         </div>
       </section>

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuotes } from "../store/quotes";
+import Loader from "../components/Loader";
 
 export default function RediscoverPage() {
   const { getRediscover } = useQuotes();
@@ -33,9 +34,7 @@ export default function RediscoverPage() {
 
   return (
     <div className="flex items-center justify-center py-28">
-      <p className="font-serif text-xl text-ink-soft">
-        Finding a line for you…
-      </p>
+      <Loader copy="Finding a line for you…" />
     </div>
   );
 }

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toPng } from "html-to-image";
 import { useQuotes } from "../store/quotes";
 import SourceChip from "../components/SourceChip";
 import QuoteCard from "../components/QuoteCard";
 import EmptyState from "../components/EmptyState";
+import Loader from "../components/Loader";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -23,6 +24,10 @@ import type { Quote, QuoteContextInfo } from "../types";
 export default function QuoteDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromRediscover =
+    (location.state as { fromRediscover?: boolean } | null)?.fromRediscover ===
+    true;
   const {
     getQuote,
     getQuoteContext,
@@ -215,7 +220,7 @@ export default function QuoteDetailPage() {
       <div>
         {backButton}
         <div className="flex items-center justify-center py-24">
-          <p className="font-serif text-lg text-ink-soft">Lifting this line…</p>
+          <Loader copy="Lifting this line…" className="py-10" />
         </div>
       </div>
     );
@@ -246,19 +251,20 @@ export default function QuoteDetailPage() {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 rounded-full px-1 py-1 text-sm text-ink-soft transition hover:text-ink"
+          className="group inline-flex items-center gap-2 rounded-full px-1 py-1 text-sm text-ink-soft transition-colors duration-200 hover:text-ink"
         >
-          <ArrowLeftIcon className="h-4 w-4" /> Back
+          <ArrowLeftIcon className="h-4 w-4 transition-transform duration-300 group-hover:-translate-x-0.5" />{" "}
+          Back
         </button>
 
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => navigate("/rediscover", { state: { excludeId: quote.id } })}
-            className="btn-ghost"
+            className="btn-ghost group"
             title="Surprise me with another line"
           >
-            <ShuffleIcon className="h-4 w-4" />
+            <ShuffleIcon className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
             Surprise me
           </button>
           <button
@@ -332,16 +338,13 @@ export default function QuoteDetailPage() {
       </div>
 
       <div
-        className="animate-rise relative mt-6 overflow-hidden rounded-3xl border border-border bg-card px-5 py-12 sm:px-16 sm:py-20"
+        className="animate-rise relative mt-6 overflow-hidden rounded-3xl border border-border bg-card px-5 py-12 shadow-card sm:px-16 sm:py-20"
         style={{ animationDelay: "60ms" }}
       >
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(120% 120% at 50% 0%, rgba(112,138,129,0.1) 0%, rgba(255,255,255,0) 55%)",
-          }}
-        />
+        <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+          <div className="absolute inset-0 ambient-drift" />
+          <div className="absolute inset-0 ambient-noise" />
+        </div>
         <div className="relative mx-auto max-w-3xl text-center">
           <span
             className="font-cormorant text-[64px] leading-none text-accent"
@@ -349,10 +352,14 @@ export default function QuoteDetailPage() {
           >
             “
           </span>
-          <blockquote className="mt-1 font-serif text-[28px] leading-[1.3] tracking-tight text-ink sm:text-[36px] lg:text-[40px]">
+          <blockquote
+            className={`mt-1 font-serif text-[28px] leading-[1.3] tracking-tight text-ink sm:text-[36px] lg:text-[40px] ${
+              fromRediscover ? "animate-unblur" : ""
+            }`}
+          >
             {quote.text}
           </blockquote>
-          <div className="mt-9">
+          <div className={`mt-9 ${fromRediscover ? "animate-fade-in" : ""}`}>
             {quote.author && (
               <p className="font-serif text-[22px] text-ink-soft">{quote.author}</p>
             )}
@@ -491,14 +498,21 @@ export default function QuoteDetailPage() {
             </div>
             <Link
               to={`/library?collection=${encodeURIComponent((quote.collections ?? [])[0] ?? "")}`}
-              className="inline-flex items-center gap-1.5 text-sm text-ink-soft transition hover:text-accent-deep"
+              className="group inline-flex items-center gap-1.5 text-sm text-ink-soft transition-colors duration-200 hover:text-accent-deep"
             >
-              View all <ArrowRightIcon className="h-4 w-4" />
+              View all{" "}
+              <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
             </Link>
           </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            {related.map((q) => (
-              <QuoteCard key={q.id} quote={q} />
+            {related.map((q, i) => (
+              <div
+                key={q.id}
+                className="animate-card-in"
+                style={{ animationDelay: `${Math.min(i, 5) * 55}ms` }}
+              >
+                <QuoteCard quote={q} />
+              </div>
             ))}
           </div>
         </section>

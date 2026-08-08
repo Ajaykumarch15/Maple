@@ -4,14 +4,11 @@ import { ArrowRightIcon, SparkleIcon } from "./icons";
 
 export default function ResurfaceCard({ quote }: { quote: Quote }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-border bg-card">
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(120% 120% at 50% 0%, rgba(112,138,129,0.14) 0%, rgba(255,255,255,0) 55%)",
-        }}
-      />
+    <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-card">
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute inset-0 ambient-drift" />
+        <div className="absolute inset-0 ambient-noise" />
+      </div>
       <div className="relative mx-auto max-w-2xl px-5 py-10 text-center sm:px-14 sm:py-16">
         <span
           className="font-cormorant text-7xl leading-none text-accent"
@@ -30,16 +27,16 @@ export default function ResurfaceCard({ quote }: { quote: Quote }) {
         )}
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-5 border-t border-border pt-7">
-          <Link to={`/quotes/${quote.id}`} className="btn-primary">
+          <Link to={`/quotes/${quote.id}`} className="btn-primary group">
             Open entry
-            <ArrowRightIcon className="h-4 w-4" />
+            <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5" />
           </Link>
           {quote.collections?.[0] && (
             <Link
               to={`/library?collection=${encodeURIComponent(quote.collections[0])}`}
-              className="inline-flex items-center gap-1.5 text-sm text-ink-soft transition hover:text-accent-deep"
+              className="group inline-flex items-center gap-1.5 text-sm text-ink-soft transition-colors duration-200 hover:text-accent-deep"
             >
-              <SparkleIcon className="h-4 w-4" />
+              <SparkleIcon className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
               From “{quote.collections[0]}”
             </Link>
           )}

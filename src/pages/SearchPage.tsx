@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useQuotes } from "../store/quotes";
 import SourceChip from "../components/SourceChip";
 import EmptyState from "../components/EmptyState";
+import Loader from "../components/Loader";
 import { useDebounce } from "../utils/useDebounce";
 import { SearchIcon, XIcon, ArrowRightIcon } from "../components/icons";
 import { formatShort } from "../utils/format";
@@ -79,8 +80,8 @@ export default function SearchPage() {
         <h1 className="mt-2 font-serif text-[40px] leading-none tracking-tight text-ink sm:text-[46px]">
           Find a line
         </h1>
-        <div className="relative mt-6 max-w-2xl">
-          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-faint" />
+        <div className="group relative mt-6 max-w-2xl">
+          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-faint transition-colors duration-200 group-focus-within:text-accent" />
           <input
             type="text"
             value={query}
@@ -111,18 +112,19 @@ export default function SearchPage() {
 
       {showResults ? (
         searching ? (
-          <div className="card mt-8 max-w-3xl flex items-center justify-center py-16">
-            <p className="font-serif text-lg text-ink-soft">
-              Searching your lines…
-            </p>
+          <div className="card mt-8 max-w-3xl">
+            <Loader copy="Searching your lines…" />
           </div>
         ) : results.length > 0 ? (
-          <div className="mt-8 max-w-3xl space-y-3">
+          <div
+            key={`${debouncedQuery}|${tag ?? ""}`}
+            className="animate-results mt-8 max-w-3xl space-y-3"
+          >
             {results.map((q) => (
               <Link
                 key={q.id}
                 to={`/quotes/${q.id}`}
-                className="card group flex items-center justify-between gap-6 px-6 py-5 transition-all duration-300 hover:border-border-strong hover:shadow-[0_14px_36px_-18px_rgba(36,33,29,0.24)]"
+                className="card card-hover group flex items-center justify-between gap-6 px-6 py-5 hover:border-border-strong"
               >
                 <div className="min-w-0">
                   <div className="flex items-center gap-3">
@@ -140,7 +142,7 @@ export default function SearchPage() {
                       .join(" · ")}
                   </p>
                 </div>
-                <ArrowRightIcon className="h-5 w-5 shrink-0 text-ink-faint transition group-hover:translate-x-0.5 group-hover:text-accent" />
+                <ArrowRightIcon className="h-5 w-5 shrink-0 -translate-x-1 text-ink-faint opacity-70 transition-all duration-300 group-hover:translate-x-0 group-hover:text-accent group-hover:opacity-100" />
               </Link>
             ))}
           </div>
@@ -182,22 +184,27 @@ export default function SearchPage() {
           >
             <p className="eyebrow mb-4">Recently saved</p>
             <div className="max-w-3xl space-y-3">
-              {recent.map((q) => (
-                <Link
+              {recent.map((q, i) => (
+                <div
                   key={q.id}
-                  to={`/quotes/${q.id}`}
-                  className="card group flex items-center justify-between gap-6 px-6 py-5 transition-all duration-300 hover:border-border-strong"
+                  className="animate-card-in"
+                  style={{ animationDelay: `${i * 60}ms` }}
                 >
-                  <div className="min-w-0">
-                    <p className="line-clamp-1 font-serif text-[18px] text-ink">
-                      “{q.text}”
-                    </p>
-                    <p className="mt-1.5 text-xs text-ink-faint">
-                      {[q.author, q.work].filter(Boolean).join(" · ")}
-                    </p>
-                  </div>
-                  <ArrowRightIcon className="h-5 w-5 shrink-0 text-ink-faint transition group-hover:translate-x-0.5 group-hover:text-accent" />
-                </Link>
+                  <Link
+                    to={`/quotes/${q.id}`}
+                    className="card card-hover group flex items-center justify-between gap-6 px-6 py-5 hover:border-border-strong"
+                  >
+                    <div className="min-w-0">
+                      <p className="line-clamp-1 font-serif text-[18px] text-ink">
+                        “{q.text}”
+                      </p>
+                      <p className="mt-1.5 text-xs text-ink-faint">
+                        {[q.author, q.work].filter(Boolean).join(" · ")}
+                      </p>
+                    </div>
+                    <ArrowRightIcon className="h-5 w-5 shrink-0 -translate-x-1 text-ink-faint opacity-70 transition-all duration-300 group-hover:translate-x-0 group-hover:text-accent group-hover:opacity-100" />
+                  </Link>
+                </div>
               ))}
             </div>
           </section>
