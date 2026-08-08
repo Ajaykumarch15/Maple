@@ -1,13 +1,19 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import type { ReactNode } from "react";
 import type { Quote, QuoteInput } from "../types";
-import { seedQuotes } from "../data/quotes";
 
 interface QuotesContextValue {
   quotes: Quote[];
-  addQuote: (data: QuoteInput, id?: string) => Quote;
-  toggleCollected: (id: string) => void;
-  deleteQuote: (id: string) => void;
+  loading: boolean;
+  addQuote: (data: QuoteInput, id?: string) => Promise<Quote>;
+  toggleCollected: (id: string) => Promise<void>;
+  deleteQuote: (id: string) => Promise<void>;
   getQuote: (id: string) => Quote | undefined;
   collections: string[];
   allTags: string[];
@@ -15,52 +21,72 @@ interface QuotesContextValue {
 
 const QuotesContext = createContext<QuotesContextValue | null>(null);
 
-const STORAGE_KEY = "margin:quotes:v1";
+const API = "/api/quotes";
 
-function load(): Quote[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) return parsed as Quote[];
-    }
-  } catch {
-    /* fall through to seed */
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const res = await fetch(path, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+  if (!res.ok) {
+    throw new Error(`API request failed with status ${res.status}`);
   }
-  return seedQuotes;
+  if (res.status === 204) {
+    return undefined as T;
+  }
+  return res.json() as Promise<T>;
 }
 
 export function QuotesProvider({ children }: { children: ReactNode }) {
-  const [quotes, setQuotes] = useState<Quote[]>(load);
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(quotes));
-    } catch {
-      /* storage unavailable */
+    let cancelled = false;
+    request<Quote[]>(API)
+      .then((data) => {
+        if (!cancelled) setQuotes(data);
+      })
+      .catch((err) => {
+        console.error("Failed to load quotes", err);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const addQuote = async (data: QuoteInput, id?: string): Promise<Quote> => {
+    if (id) {
+      const updated = await request<Quote>(`${API}/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      });
+      setQuotes((qs) => qs.map((q) => (q.id === id ? updated : q)));
+      return updated;
     }
-  }, [quotes]);
-
-  const addQuote = (data: QuoteInput, id?: string): Quote => {
-    const existing = id ? quotes.find((q) => q.id === id) : undefined;
-    const result: Quote = existing
-      ? { ...existing, ...data }
-      : { ...data, id: crypto.randomUUID(), savedDate: new Date().toISOString() };
-    setQuotes((qs) =>
-      existing
-        ? qs.map((q) => (q.id === id ? result : q))
-        : [result, ...qs],
-    );
-    return result;
+    const created = await request<Quote>(API, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    setQuotes((qs) => [created, ...qs]);
+    return created;
   };
 
-  const toggleCollected = (id: string) => {
-    setQuotes((qs) =>
-      qs.map((q) => (q.id === id ? { ...q, collected: !q.collected } : q)),
-    );
+  const toggleCollected = async (id: string) => {
+    const current = quotes.find((q) => q.id === id);
+    if (!current) return;
+    const updated = await request<Quote>(`${API}/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ collected: !current.collected }),
+    });
+    setQuotes((qs) => qs.map((q) => (q.id === id ? updated : q)));
   };
 
-  const deleteQuote = (id: string) => {
+  const deleteQuote = async (id: string) => {
+    await request<never>(`${API}/${id}`, { method: "DELETE" });
     setQuotes((qs) => qs.filter((q) => q.id !== id));
   };
 
@@ -84,6 +110,7 @@ export function QuotesProvider({ children }: { children: ReactNode }) {
 
   const value: QuotesContextValue = {
     quotes,
+    loading,
     addQuote,
     toggleCollected,
     deleteQuote,

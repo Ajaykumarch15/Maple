@@ -16,7 +16,7 @@ const SORTS: { value: SortKey; label: string }[] = [
 ];
 
 export default function LibraryPage() {
-  const { quotes } = useQuotes();
+  const { quotes, loading } = useQuotes();
   const [params, setParams] = useSearchParams();
   const collection = params.get("collection") ?? undefined;
 
@@ -126,7 +126,13 @@ export default function LibraryPage() {
         </div>
       )}
 
-      {filtered.length > 0 ? (
+      {loading ? (
+        <div className="card mt-8 flex items-center justify-center py-24">
+          <p className="font-serif text-xl text-ink-soft">
+            Gathering your lines…
+          </p>
+        </div>
+      ) : filtered.length > 0 ? (
         <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((quote) => (
             <QuoteCard key={quote.id} quote={quote} />

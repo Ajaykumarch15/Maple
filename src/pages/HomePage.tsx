@@ -7,8 +7,18 @@ import { PlusIcon, SparkleIcon, ArrowRightIcon } from "../components/icons";
 import { dailyIndex, formatTodayLong, greeting } from "../utils/format";
 
 export default function HomePage() {
-  const { quotes } = useQuotes();
+  const { quotes, loading } = useQuotes();
   const featured = quotes[dailyIndex(quotes.length)];
+
+  if (loading) {
+    return (
+      <div className="card flex items-center justify-center py-24">
+        <p className="font-serif text-xl text-ink-soft">
+          Gathering your lines…
+        </p>
+      </div>
+    );
+  }
 
   const reflectionCount = quotes.filter((q) => q.reflection?.trim()).length;
   const collectionCount = new Set(

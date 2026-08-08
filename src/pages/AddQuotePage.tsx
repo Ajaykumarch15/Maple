@@ -70,24 +70,31 @@ export default function AddQuotePage() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!text.trim()) {
       setError("A quote needs at least one line worth keeping.");
       return;
     }
-    const saved = addQuote(
-      {
-        text: text.trim(),
-        sourceType,
-        work: work.trim() || undefined,
-        author: author.trim() || undefined,
-        reflection: reflection.trim() || undefined,
-        tags,
-        collection: collection.trim() || undefined,
-      },
-      editId ?? undefined,
-    );
-    navigate(`/quotes/${saved.id}`);
+    try {
+      const saved = await addQuote(
+        {
+          text: text.trim(),
+          sourceType,
+          work: work.trim() || undefined,
+          author: author.trim() || undefined,
+          reflection: reflection.trim() || undefined,
+          tags,
+          collection: collection.trim() || undefined,
+        },
+        editId ?? undefined,
+      );
+      navigate(`/quotes/${saved.id}`);
+    } catch (err) {
+      console.error("Failed to save quote", err);
+      setError(
+        "Couldn't reach the server. Check that the API is running (npm run dev).",
+      );
+    }
   };
 
   return (

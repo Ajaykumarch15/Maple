@@ -47,13 +47,17 @@ export default function QuoteDetailPage() {
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!quote) return;
-    deleteQuote(quote.id);
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate("/library");
+    try {
+      await deleteQuote(quote.id);
+      if (window.history.length > 1) {
+        navigate(-1);
+      } else {
+        navigate("/library");
+      }
+    } catch (err) {
+      console.error("Failed to delete quote", err);
     }
   };
 
@@ -107,7 +111,11 @@ export default function QuoteDetailPage() {
           </button>
           <button
             type="button"
-            onClick={() => toggleCollected(quote.id)}
+            onClick={() => {
+              toggleCollected(quote.id).catch((err) =>
+                console.error("Failed to toggle collect", err),
+              );
+            }}
             className={`btn-ghost ${
               quote.collected ? "border-accent! text-accent-deep!" : ""
             }`}
