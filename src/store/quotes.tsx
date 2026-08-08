@@ -50,7 +50,7 @@ interface QuotesContextValue {
 
 const QuotesContext = createContext<QuotesContextValue | null>(null);
 
-const API_BASE = (import.meta.env.VITE_API_BASE || "/api").replace(/\/+$/, "");
+const API_BASE = "/api";
 const API = `${API_BASE}/quotes`;
 
 const DEFAULT_LIMIT = 30;

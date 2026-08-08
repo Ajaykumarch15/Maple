@@ -22,7 +22,11 @@ Built around the flow **Capture → Organize → Search → Filter → Read → 
 - **Frontend** — React 18, TypeScript, Vite, Tailwind CSS v4, React Router
 - **Backend** — Node.js, Express, TypeScript (tsx)
 - **Database** — PostgreSQL with Drizzle ORM (works with Neon, Supabase, or any Postgres)
-- **Deployment** — a single Render web service serving both the API and the built frontend
+
+## Prerequisites
+
+- Node.js 18+ and npm
+- A PostgreSQL database (e.g. a free Neon project) and its connection string
 
 ## Getting Started
 
@@ -48,28 +52,28 @@ Open http://localhost:5173.
 
 ### Environment Variables
 
-| Variable        | Required | Description                                                                  |
-| --------------- | -------- | ---------------------------------------------------------------------------- |
-| `DATABASE_URL`  | yes      | PostgreSQL connection string, e.g. `postgresql://user:pass@host:5432/margin?sslmode=require` |
-| `PORT`          | no       | API port (default `4000`). Render sets this automatically.                    |
-| `CORS_ORIGIN`   | no       | Restrict browser CORS to one origin. Leave unset to allow any origin.         |
+Maple reads these from `.env`:
 
-When deploying the frontend to GitHub Pages (not the default), set `VITE_API_BASE` as a GitHub Actions repository variable.
+| Variable       | Required | Description                                                                  |
+| -------------- | -------- | ---------------------------------------------------------------------------- |
+| `DATABASE_URL` | yes      | PostgreSQL connection string, e.g. `postgresql://user:pass@host:5432/margin?sslmode=require` |
+| `PORT`         | no       | API port (default `4000`).                                                    |
+| `CORS_ORIGIN`  | no       | Restrict browser CORS to one origin. Leave unset to allow any origin.         |
 
 ## Scripts
 
-| Script           | Description                                             |
-| ---------------- | ------------------------------------------------------- |
-| `npm run dev`    | Run API and Vite dev server together                    |
-| `npm run dev:server` | API only (tsx watch, port 4000)                     |
-| `npm run dev:client` | Vite client only (port 5173)                        |
-| `npm run build`  | Type-check and build the frontend into `dist/`          |
-| `npm run start`  | Serve the API (also serves `dist/` if present)          |
-| `npm run preview`| Preview the production build locally                    |
-| `npm run db:generate` | Generate a Drizzle migration from schema changes |
+| Script             | Description                                             |
+| ------------------ | ------------------------------------------------------- |
+| `npm run dev`      | Run API and Vite dev server together                    |
+| `npm run dev:server` | API only (tsx watch, port 4000)                       |
+| `npm run dev:client` | Vite client only (port 5173)                          |
+| `npm run build`    | Type-check and build the frontend into `dist/`          |
+| `npm run start`    | Run the API server (serves `dist/` if present)          |
+| `npm run preview`  | Preview the production build locally                    |
+| `npm run db:generate` | Generate a Drizzle migration from schema changes    |
 | `npm run db:migrate`  | Apply pending Drizzle migrations to the database     |
-| `npm run db:push`     | Push schema changes directly (see note below)         |
-| `npm run db:seed`     | Reset and seed the database with sample quotes        |
+| `npm run db:push`     | Push schema changes directly (see note below)       |
+| `npm run db:seed`     | Reset and seed the database with sample quotes      |
 
 ## Database
 
@@ -141,10 +145,11 @@ Sort orders map to fixed columns (never raw input) and always tie-break on
 
 ```
 server/
-  db/            # Drizzle schema + connection pool
+  db/            # Drizzle schema, connection pool, migrations
   routes/        # Express routes for /api/quotes
   seed.ts        # Sample data seeder
-  index.ts       # Express app (API + static dist serving)
+  app.ts         # Express app (API + static dist serving)
+  index.ts       # Server entry point
 src/
   components/    # Layout, sidebar, quote cards, icons, etc.
   pages/         # Home, Library, Collections, Reflections, Search, Quote detail, Add/Edit, Rediscover
@@ -153,29 +158,16 @@ src/
   data/quotes.ts # Seed data source
 ```
 
-## Deployment (Vercel)
+## Testing
 
-This app deploys to **Vercel** as a single project — the Express API runs as a
-serverless function (`api/index.ts`) and Vercel serves the built frontend from
-`dist`. A rewrite sends `/api/*` to the function and every other route to
-`index.html` (SPA fallback), so the browser always talks to the same origin and
-there is no CORS or proxy setup.
+There is no automated test suite yet. Before shipping a change, verify with:
 
-1. Push the repository to GitHub.
-2. On [vercel.com](https://vercel.com): **Add New → Project** → import the repo.
-3. Framework preset: **Vite** (build command `npm run build`, output `dist` are
-   set by `vercel.json`).
-4. Add the environment variable `DATABASE_URL` (your PostgreSQL connection
-   string).
-5. Deploy. Every push to `main` auto-redeploys.
+```bash
+npm run build    # type-checks (tsc) and builds the frontend
+```
 
-To verify locally, run the dev servers as described above and hit
-`/api/health`.
-
-> The previous setup used a single Render web service serving both the API and
-> the frontend. Render is no longer needed — remove that service once the Vercel
-> deployment is verified.
-
+then run the app with `npm run dev` and smoke-test the main flows: quote
+CRUD, search, filters, sorting, favorites, collections, and reading mode.
 
 ## License
 
