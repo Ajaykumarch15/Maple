@@ -110,7 +110,7 @@ export default function AddQuotePage() {
           aria-modal="true"
           aria-label={editing ? "Edit save" : "New save"}
         >
-          <div className="flex items-start justify-between border-b border-border px-8 py-6">
+          <div className="flex items-start justify-between border-b border-border px-5 py-6 sm:px-8">
             <div>
               <h2 className="font-serif text-[26px] tracking-tight text-ink">
                 {editing ? "Edit save" : "New save"}
@@ -131,7 +131,7 @@ export default function AddQuotePage() {
             </button>
           </div>
 
-          <div className="space-y-7 px-8 py-8">
+          <div className="space-y-7 px-5 py-8 sm:px-8">
             <div>
               <label htmlFor="quote-text" className="eyebrow block">
                 The quote
@@ -290,13 +290,13 @@ export default function AddQuotePage() {
             )}
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-8 py-6">
+          <div className="flex flex-col gap-4 border-t border-border px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8 sm:py-6">
             <p className="text-[12px] text-ink-faint">
               {editing
                 ? "Changes will be saved back to the original entry."
                 : "Saved privately to your commonplace book."}
             </p>
-            <div className="flex items-center gap-3">
+            <div className="grid w-full grid-cols-2 gap-3 sm:flex sm:w-auto sm:items-center sm:gap-3">
               <button type="button" onClick={close} className="btn-ghost">
                 Discard
               </button>

@@ -63,7 +63,7 @@ html.dark {
     @apply rounded-2xl border border-border bg-card;
   }
   .input {
-    @apply w-full rounded-xl border border-border bg-card px-4 py-3 text-[15px] text-ink shadow-[0_1px_2px_rgba(36,33,29,0.03)] outline-none transition placeholder:text-ink-faint focus:border-accent/60 focus:ring-4 focus:ring-accent/15;
+    @apply w-full rounded-xl border border-border bg-card px-4 py-3 text-[16px] text-ink shadow-[0_1px_2px_rgba(36,33,29,0.03)] outline-none transition placeholder:text-ink-faint focus:border-accent/60 focus:ring-4 focus:ring-accent/15;
   }
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-medium text-white transition duration-200 hover:bg-accent-deep focus:outline-none focus:ring-4 focus:ring-accent/25;

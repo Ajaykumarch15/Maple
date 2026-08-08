@@ -133,7 +133,7 @@ export default function QuoteDetailPage() {
           <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
 
           {confirmDelete ? (
-            <div className="flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 py-1.5 pl-4 pr-1.5 dark:border-red-800/50 dark:bg-red-950/40">
+            <div className="flex max-w-full flex-wrap items-center justify-end gap-1.5 rounded-full border border-red-200 bg-red-50 py-1.5 pl-4 pr-1.5 dark:border-red-800/50 dark:bg-red-950/40">
               <span className="text-sm text-red-700 dark:text-red-300">
                 Delete this line?
               </span>
@@ -166,7 +166,7 @@ export default function QuoteDetailPage() {
       </div>
 
       <div
-        className="animate-rise relative mt-6 overflow-hidden rounded-3xl border border-border bg-card px-8 py-14 sm:px-16 sm:py-20"
+        className="animate-rise relative mt-6 overflow-hidden rounded-3xl border border-border bg-card px-5 py-12 sm:px-16 sm:py-20"
         style={{ animationDelay: "60ms" }}
       >
         <div
@@ -246,7 +246,7 @@ export default function QuoteDetailPage() {
                 className="flex items-start justify-between gap-4 border-b border-border/70 pb-3 last:border-0 last:pb-0"
               >
                 <dt className="shrink-0 text-ink-faint">{k}</dt>
-                <dd className="text-right font-medium text-ink-soft">{v}</dd>
+                <dd className="min-w-0 flex-1 break-words text-right font-medium text-ink-soft">{v}</dd>
               </div>
             ))}
             {quote.collection && (
@@ -287,7 +287,7 @@ export default function QuoteDetailPage() {
           className="animate-rise mt-12"
           style={{ animationDelay: "180ms" }}
         >
-          <div className="mb-5 flex items-end justify-between gap-4">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className="font-serif text-[24px] tracking-tight text-ink">
                 From the same collection

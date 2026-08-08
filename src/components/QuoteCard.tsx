@@ -37,7 +37,7 @@ export default function QuoteCard({ quote, className }: QuoteCardProps) {
           )}
         </div>
         {quote.collection && (
-          <span className="shrink-0 text-[11px] tracking-wide text-ink-faint">
+          <span className="max-w-[45%] shrink-0 truncate text-[11px] tracking-wide text-ink-faint">
             {quote.collection}
           </span>
         )}

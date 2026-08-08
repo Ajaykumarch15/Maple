@@ -39,7 +39,7 @@ function MobileTopBar() {
           </Link>
         </div>
       </div>
-      <nav className="flex gap-1 overflow-x-auto px-3 pb-3">
+      <nav className="flex gap-1 overflow-x-auto px-5 pb-3">
         {NAV_ITEMS.map((item) => (
           <NavLink
             key={item.to}

@@ -38,7 +38,7 @@ export default function HomePage() {
         <div>
           <p className="eyebrow">{formatTodayLong()}</p>
           <h1 className="mt-3 font-serif text-[40px] leading-[1.05] tracking-tight text-ink sm:text-[52px]">
-            {greeting()}, Alex.
+            {greeting()}, Maple.
           </h1>
           <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-soft">
             Every line worth keeping, in one quiet place.{" "}
@@ -94,7 +94,7 @@ export default function HomePage() {
         className="animate-rise mt-12"
         style={{ animationDelay: "180ms" }}
       >
-        <div className="mb-5 flex items-end justify-between gap-4">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
           <div>
             <h2 className="font-serif text-[26px] tracking-tight text-ink">
               Recent saves

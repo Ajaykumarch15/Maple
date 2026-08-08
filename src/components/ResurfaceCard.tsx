@@ -12,7 +12,7 @@ export default function ResurfaceCard({ quote }: { quote: Quote }) {
             "radial-gradient(120% 120% at 50% 0%, rgba(112,138,129,0.14) 0%, rgba(255,255,255,0) 55%)",
         }}
       />
-      <div className="relative mx-auto max-w-2xl px-8 py-12 text-center sm:px-14 sm:py-16">
+      <div className="relative mx-auto max-w-2xl px-5 py-10 text-center sm:px-14 sm:py-16">
         <span
           className="font-cormorant text-7xl leading-none text-accent"
           aria-hidden="true"
