@@ -17,7 +17,10 @@ export default function EmptyState({
   return (
     <div className="card relative overflow-hidden px-8 py-16 text-center">
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[rgba(139,92,255,0.14)] to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-44"
+        style={{
+          background: "linear-gradient(to bottom, var(--mood-soft), transparent)",
+        }}
         aria-hidden="true"
       />
       <div

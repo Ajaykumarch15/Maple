@@ -338,7 +338,7 @@ export default function QuoteDetailPage() {
       </div>
 
       <div
-        className="animate-rise relative mt-6 overflow-hidden rounded-3xl border border-border bg-card px-5 py-12 shadow-[0_0_70px_-24px_rgba(139,92,255,0.5)] sm:px-16 sm:py-20"
+        className="animate-rise relative mt-6 overflow-hidden rounded-3xl border border-border bg-card px-5 py-12 shadow-[0_0_70px_-24px_var(--mood-glow)] sm:px-16 sm:py-20"
         style={{ animationDelay: "60ms" }}
       >
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -467,12 +467,12 @@ export default function QuoteDetailPage() {
                 value={collectionInput}
                 onChange={(e) => setCollectionInput(e.target.value)}
                 placeholder="Add a collection…"
-                className="min-w-0 flex-1 rounded-full border border-dashed border-border-strong bg-card px-4 py-1.5 text-[13px] text-ink outline-none transition placeholder:text-ink-faint focus:border-cyan/55 focus:ring-4 focus:ring-accent/20"
+                className="min-w-0 flex-1 rounded-full border border-dashed border-border-strong bg-card px-4 py-1.5 text-[13px] text-ink outline-none transition placeholder:text-ink-faint focus:border-accent/60 focus:ring-4 focus:ring-accent/20"
               />
               <button
                 type="submit"
                 aria-label="Add collection"
-                className="bg-gradient-primary inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white shadow-[0_6px_16px_-8px_rgba(139,92,255,0.8)] transition hover:brightness-110"
+                className="bg-gradient-primary inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white shadow-[0_6px_16px_-8px_var(--mood-glow-strong)] transition hover:brightness-110"
               >
                 <PlusIcon className="h-3.5 w-3.5" />
               </button>

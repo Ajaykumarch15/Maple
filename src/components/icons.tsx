@@ -158,6 +158,17 @@ export function MoonIcon(props: IconProps) {
   );
 }
 
+export function PaletteIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 3a9 9 0 1 0 0 18h1.6a2.1 2.1 0 0 0 1.5-3.6 2.1 2.1 0 0 1 1.5-3.6H18a3 3 0 0 0 3-3C21 6 16.97 3 12 3z" />
+      <circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="7.2" r="1" fill="currentColor" stroke="none" />
+      <circle cx="16.4" cy="10.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 export function TrashIcon(props: IconProps) {
   return (
     <svg {...base(props)}>

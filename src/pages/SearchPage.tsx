@@ -81,7 +81,7 @@ export default function SearchPage() {
           Find a line
         </h1>
         <div className="group relative mt-6 max-w-2xl">
-          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-faint transition-colors duration-200 group-focus-within:text-cyan" />
+          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-faint transition-colors duration-200 group-focus-within:text-accent" />
           <input
             type="text"
             value={query}
@@ -142,7 +142,7 @@ export default function SearchPage() {
                       .join(" · ")}
                   </p>
                 </div>
-                <ArrowRightIcon className="h-5 w-5 shrink-0 -translate-x-1 text-ink-faint opacity-70 transition-all duration-300 group-hover:translate-x-0 group-hover:text-cyan group-hover:opacity-100" />
+                    <ArrowRightIcon className="h-5 w-5 shrink-0 -translate-x-1 text-ink-faint opacity-70 transition-all duration-300 group-hover:translate-x-0 group-hover:text-accent group-hover:opacity-100" />
               </Link>
             ))}
           </div>
@@ -202,7 +202,7 @@ export default function SearchPage() {
                         {[q.author, q.work].filter(Boolean).join(" · ")}
                       </p>
                     </div>
-                    <ArrowRightIcon className="h-5 w-5 shrink-0 -translate-x-1 text-ink-faint opacity-70 transition-all duration-300 group-hover:translate-x-0 group-hover:text-cyan group-hover:opacity-100" />
+                <ArrowRightIcon className="h-5 w-5 shrink-0 -translate-x-1 text-ink-faint opacity-70 transition-all duration-300 group-hover:translate-x-0 group-hover:text-accent group-hover:opacity-100" />
                   </Link>
                 </div>
               ))}

@@ -2,7 +2,8 @@ import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { useTheme } from "../theme";
 import { NAV_ITEMS } from "./nav";
-import { MoonIcon, PlusIcon, SunIcon } from "./icons";
+import { PlusIcon } from "./icons";
+import { moodName } from "../moods";
 
 function AmbientBackground() {
   return (
@@ -17,8 +18,7 @@ function AmbientBackground() {
 }
 
 function MobileTopBar() {
-  const { theme, toggleTheme } = useTheme();
-  const isDark = theme === "dark";
+  const { mood, cycleMood } = useTheme();
 
   return (
     <header className="glass sticky top-0 z-40 border-b border-border lg:hidden">
@@ -32,20 +32,21 @@ function MobileTopBar() {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-ink-soft transition hover:bg-card/60 hover:text-ink"
+            onClick={cycleMood}
+            aria-label={`Color mood: ${moodName(mood)}`}
+            title={`Color mood: ${moodName(mood)}`}
+            className="group inline-flex h-10 w-10 items-center justify-center rounded-full text-ink-soft transition hover:bg-card/60 hover:text-ink"
           >
-            {isDark ? (
-              <MoonIcon className="h-5 w-5" />
-            ) : (
-              <SunIcon className="h-5 w-5" />
-            )}
+            <span
+              aria-hidden="true"
+              className="h-5 w-5 rounded-full transition-transform duration-300 group-hover:rotate-45"
+              style={{ background: "var(--mood-gradient)" }}
+            />
           </button>
           <Link
             to="/add"
             aria-label="New save"
-            className="bg-gradient-primary inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-[0_6px_18px_-6px_rgba(139,92,255,0.7)] transition hover:brightness-110"
+            className="bg-gradient-primary inline-flex h-10 w-10 items-center justify-center rounded-full text-white shadow-[0_6px_18px_-6px_var(--mood-glow)] transition hover:brightness-110"
           >
             <PlusIcon className="h-5 w-5" />
           </Link>
@@ -60,7 +61,7 @@ function MobileTopBar() {
             className={({ isActive }) =>
               `whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] font-medium transition ${
                 isActive
-                  ? "bg-gradient-primary text-white shadow-[0_6px_18px_-8px_rgba(139,92,255,0.8)]"
+                  ? "bg-gradient-primary text-white shadow-[0_6px_18px_-8px_var(--mood-glow-strong)]"
                   : "text-ink-soft hover:bg-card/60 hover:text-ink"
               }`
             }

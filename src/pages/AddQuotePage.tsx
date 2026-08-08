@@ -229,7 +229,7 @@ export default function AddQuotePage() {
                         onClick={() => setSourceType(t)}
                         className={
                           sourceType === t
-                            ? "chip border-transparent bg-gradient-primary text-white shadow-[0_6px_16px_-8px_rgba(139,92,255,0.8)]"
+                            ? "chip border-transparent bg-gradient-primary text-white shadow-[0_6px_16px_-8px_var(--mood-glow-strong)]"
                             : "chip hover:border-ink-soft/40 hover:text-ink"
                         }
                       >
@@ -311,7 +311,7 @@ export default function AddQuotePage() {
                           ? "Add a tag, press Enter…"
                           : "Add another…"
                       }
-                      className="min-w-[160px] flex-1 rounded-full border border-dashed border-border-strong bg-card px-4 py-1.5 text-[13px] text-ink outline-none transition placeholder:text-ink-faint focus:border-cyan/55 focus:ring-4 focus:ring-accent/20"
+                      className="min-w-[160px] flex-1 rounded-full border border-dashed border-border-strong bg-card px-4 py-1.5 text-[13px] text-ink outline-none transition placeholder:text-ink-faint focus:border-accent/60 focus:ring-4 focus:ring-accent/20"
                     />
                   </div>
                   {suggestions.length > 0 && (

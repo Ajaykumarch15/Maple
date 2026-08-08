@@ -4,22 +4,28 @@ import { ArrowRightIcon, SparkleIcon } from "./icons";
 
 export default function ResurfaceCard({ quote }: { quote: Quote }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-[0_0_70px_-20px_rgba(139,92,255,0.55)]">
+    <div className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-[0_0_70px_-20px_var(--mood-glow)]">
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute inset-0 ambient-drift" />
         <div className="absolute inset-0 ambient-noise" />
-        <div className="animate-pulse-glow absolute left-1/2 top-[-10rem] h-80 w-[44rem] max-w-none -translate-x-1/2 rounded-full blur-3xl bg-gradient-to-r from-[rgba(139,92,255,0.35)] via-[rgba(197,73,255,0.22)] to-[rgba(0,229,255,0.25)]" />
-        <span className="animate-twinkle absolute left-[14%] top-[22%] h-1.5 w-1.5 rounded-full bg-accent" />
+        <div
+          className="animate-pulse-glow absolute left-1/2 top-[-10rem] h-80 w-[44rem] max-w-none -translate-x-1/2 rounded-full blur-3xl"
+          style={{
+            background:
+              "linear-gradient(90deg, var(--mood-glow-soft), var(--mood-glow-secondary), var(--mood-glow-tertiary))",
+          }}
+        />
+        <span className="animate-twinkle absolute left-[14%] top-[22%] h-1.5 w-1.5 rounded-full bg-mood" />
         <span
-          className="animate-twinkle absolute right-[18%] top-[38%] h-1 w-1 rounded-full bg-cyan"
+          className="animate-twinkle absolute right-[18%] top-[38%] h-1 w-1 rounded-full bg-mood-tertiary"
           style={{ animationDelay: "1.4s" }}
         />
         <span
-          className="animate-twinkle absolute bottom-[26%] left-[22%] h-1 w-1 rounded-full bg-rose"
+          className="animate-twinkle absolute bottom-[26%] left-[22%] h-1 w-1 rounded-full bg-mood-secondary"
           style={{ animationDelay: "2.8s" }}
         />
         <span
-          className="animate-twinkle absolute bottom-[18%] right-[24%] h-1.5 w-1.5 rounded-full bg-accent"
+          className="animate-twinkle absolute bottom-[18%] right-[24%] h-1.5 w-1.5 rounded-full bg-mood"
           style={{ animationDelay: "3.9s" }}
         />
       </div>

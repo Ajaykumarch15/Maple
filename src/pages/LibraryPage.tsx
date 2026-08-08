@@ -332,7 +332,7 @@ export default function LibraryPage() {
 
       <div className="animate-rise mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="group relative flex-1">
-          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-faint transition-colors duration-200 group-focus-within:text-cyan" />
+          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-faint transition-colors duration-200 group-focus-within:text-accent" />
           <input
             type="text"
             value={query}
@@ -374,7 +374,7 @@ export default function LibraryPage() {
             onClick={() => setView("all")}
             className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition ${
               view === "all"
-                ? "bg-gradient-primary text-white shadow-[0_6px_16px_-8px_rgba(139,92,255,0.8)]"
+                ? "bg-gradient-primary text-white shadow-[0_6px_16px_-8px_var(--mood-glow-strong)]"
                 : "text-ink-soft hover:text-ink"
             }`}
           >
@@ -385,7 +385,7 @@ export default function LibraryPage() {
             onClick={() => setView("favorites")}
             className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[12px] font-medium transition ${
               view === "favorites"
-                ? "bg-gradient-primary text-white shadow-[0_6px_16px_-8px_rgba(139,92,255,0.8)]"
+                ? "bg-gradient-primary text-white shadow-[0_6px_16px_-8px_var(--mood-glow-strong)]"
                 : "text-ink-soft hover:text-ink"
             }`}
           >
@@ -454,7 +454,7 @@ export default function LibraryPage() {
                     onClick={() => setSource(t)}
                     className={
                       source === t
-                        ? "chip border-transparent bg-gradient-primary text-white shadow-[0_6px_16px_-8px_rgba(139,92,255,0.8)]"
+                        ? "chip border-transparent bg-gradient-primary text-white shadow-[0_6px_16px_-8px_var(--mood-glow-strong)]"
                         : "chip hover:border-ink-soft/40 hover:text-ink"
                     }
                   >

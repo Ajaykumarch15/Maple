@@ -6,17 +6,12 @@ import { CollectionsIcon, ArrowRightIcon } from "../components/icons";
 
 const GRADIENTS = [
   "bg-gradient-primary",
-  "bg-gradient-cyan",
-  "bg-gradient-to-br from-[#4d7cff] to-[#8b5cff]",
+  "bg-gradient-secondary",
+  "bg-gradient-tertiary",
   "bg-gradient-spectrum",
 ];
 
-const GLOWS = [
-  "rgba(139, 92, 255, 0.18)",
-  "rgba(0, 229, 255, 0.14)",
-  "rgba(77, 124, 255, 0.18)",
-  "rgba(255, 60, 172, 0.18)",
-];
+const GLOW = "var(--mood-glow-soft)";
 
 function hashOf(value: string) {
   let h = 0;
@@ -65,7 +60,6 @@ export default function CollectionsPage() {
           {entries.map((entry, i) => {
             const index = hashOf(entry.name) % GRADIENTS.length;
             const gradient = GRADIENTS[index];
-            const glow = GLOWS[index];
             return (
               <Link
                 key={entry.name}
@@ -76,13 +70,13 @@ export default function CollectionsPage() {
                 <div
                   className="pointer-events-none absolute -left-14 -top-14 h-44 w-44 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
                   style={{
-                    background: `radial-gradient(circle, ${glow}, transparent 65%)`,
+                    background: `radial-gradient(circle, ${GLOW}, transparent 65%)`,
                   }}
                   aria-hidden="true"
                 />
                 <div className="relative flex items-center justify-between gap-3">
                   <span
-                    className={`${gradient} inline-flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-[0_8px_20px_-8px_rgba(139,92,255,0.7)] transition-all duration-300 group-hover:-rotate-6 group-hover:scale-105`}
+                    className={`${gradient} inline-flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-[0_8px_20px_-8px_var(--mood-glow)] transition-all duration-300 group-hover:-rotate-6 group-hover:scale-105`}
                   >
                     <CollectionsIcon className="h-5 w-5" />
                   </span>
@@ -100,7 +94,7 @@ export default function CollectionsPage() {
                 )}
                 <div className="relative mt-6 flex items-center gap-1.5 border-t border-border/80 pt-4 text-sm text-ink-soft transition-colors duration-300 group-hover:text-accent-deep">
                   Open collection
-                  <ArrowRightIcon className="h-4 w-4 text-cyan transition-transform duration-300 group-hover:translate-x-1" />
+                  <ArrowRightIcon className="h-4 w-4 text-accent transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
               </Link>
             );
