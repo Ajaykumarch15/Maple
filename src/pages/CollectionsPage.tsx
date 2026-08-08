@@ -8,10 +8,12 @@ export default function CollectionsPage() {
 
   const grouped = new Map<string, typeof quotes>();
   for (const q of quotes) {
-    if (!q.collection) continue;
-    const list = grouped.get(q.collection) ?? [];
-    list.push(q);
-    grouped.set(q.collection, list);
+    for (const name of q.collections ?? []) {
+      if (!name.trim()) continue;
+      const list = grouped.get(name) ?? [];
+      list.push(q);
+      grouped.set(name, list);
+    }
   }
 
   const entries = [...grouped.entries()].sort((a, b) =>

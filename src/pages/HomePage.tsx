@@ -3,7 +3,12 @@ import { useQuotes } from "../store/quotes";
 import QuoteCard from "../components/QuoteCard";
 import StatsCard from "../components/StatsCard";
 import ResurfaceCard from "../components/ResurfaceCard";
-import { PlusIcon, SparkleIcon, ArrowRightIcon } from "../components/icons";
+import {
+  PlusIcon,
+  ShuffleIcon,
+  SparkleIcon,
+  ArrowRightIcon,
+} from "../components/icons";
 import { dailyIndex, formatTodayLong, greeting } from "../utils/format";
 
 export default function HomePage() {
@@ -22,7 +27,7 @@ export default function HomePage() {
 
   const reflectionCount = quotes.filter((q) => q.reflection?.trim()).length;
   const collectionCount = new Set(
-    quotes.map((q) => q.collection).filter(Boolean),
+    quotes.flatMap((q) => q.collections ?? []).filter(Boolean),
   ).size;
 
   const recent = [...quotes]
@@ -46,10 +51,16 @@ export default function HomePage() {
             one of them find you tonight.
           </p>
         </div>
-        <Link to="/add" className="btn-primary">
-          <PlusIcon className="h-4 w-4" />
-          New save
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link to="/rediscover" className="btn-ghost">
+            <ShuffleIcon className="h-4 w-4" />
+            Rediscover a line
+          </Link>
+          <Link to="/add" className="btn-primary">
+            <PlusIcon className="h-4 w-4" />
+            New save
+          </Link>
+        </div>
       </header>
 
       {featured && (

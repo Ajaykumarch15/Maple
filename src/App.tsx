@@ -7,6 +7,7 @@ import ReflectionsPage from "./pages/ReflectionsPage";
 import SearchPage from "./pages/SearchPage";
 import QuoteDetailPage from "./pages/QuoteDetailPage";
 import AddQuotePage from "./pages/AddQuotePage";
+import RediscoverPage from "./pages/RediscoverPage";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
         <Route path="collections" element={<CollectionsPage />} />
         <Route path="reflections" element={<ReflectionsPage />} />
         <Route path="search" element={<SearchPage />} />
+        <Route path="rediscover" element={<RediscoverPage />} />
         <Route path="quotes/:id" element={<QuoteDetailPage />} />
         <Route path="*" element={<HomePage />} />
       </Route>

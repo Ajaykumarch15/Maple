@@ -23,11 +23,16 @@ export interface Quote {
   author?: string;
   reflection?: string;
   tags: string[];
-  collection?: string;
+  collections?: string[];
   savedDate: string;
   preservedFrom?: string;
   device?: string;
   collected?: boolean;
+  favorite?: boolean;
+  lastOpenedAt?: string | null;
 }
 
-export type QuoteInput = Omit<Quote, "id" | "savedDate" | "collected">;
+export type QuoteInput = Omit<
+  Quote,
+  "id" | "savedDate" | "collected" | "favorite" | "lastOpenedAt"
+>;

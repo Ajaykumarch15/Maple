@@ -11,11 +11,12 @@ const rows: NewQuote[] = seedQuotes.map((q) => ({
   author: q.author ?? null,
   reflection: q.reflection ?? null,
   tags: q.tags,
-  collection: q.collection ?? null,
+  collections: q.collections ?? [],
   savedDate: new Date(q.savedDate),
   preservedFrom: q.preservedFrom ?? null,
   device: q.device ?? null,
   collected: q.collected ?? false,
+  favorite: q.favorite ?? false,
 }));
 
 async function main() {

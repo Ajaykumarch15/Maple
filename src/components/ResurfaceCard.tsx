@@ -34,13 +34,13 @@ export default function ResurfaceCard({ quote }: { quote: Quote }) {
             Open entry
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
-          {quote.collection && (
+          {quote.collections?.[0] && (
             <Link
-              to={`/library?collection=${encodeURIComponent(quote.collection)}`}
+              to={`/library?collection=${encodeURIComponent(quote.collections[0])}`}
               className="inline-flex items-center gap-1.5 text-sm text-ink-soft transition hover:text-accent-deep"
             >
               <SparkleIcon className="h-4 w-4" />
-              From “{quote.collection}”
+              From “{quote.collections[0]}”
             </Link>
           )}
         </div>

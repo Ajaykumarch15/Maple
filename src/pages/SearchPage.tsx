@@ -90,7 +90,9 @@ export default function SearchPage() {
                     “{q.text}”
                   </p>
                   <p className="mt-2 truncate text-xs text-ink-faint">
-                    {[q.author, q.work, q.collection].filter(Boolean).join(" · ")}
+                    {[q.author, q.work, ...(q.collections ?? [])]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </p>
                 </div>
                 <ArrowRightIcon className="h-5 w-5 shrink-0 text-ink-faint transition group-hover:translate-x-0.5 group-hover:text-accent" />

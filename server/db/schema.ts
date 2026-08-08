@@ -30,17 +30,22 @@ export const quotes = pgTable(
       .array()
       .notNull()
       .default([]),
-    collection: text("collection"),
+    collections: text("collections")
+      .array()
+      .notNull()
+      .default([]),
     savedDate: timestamp("saved_date", { withTimezone: true })
       .notNull()
       .defaultNow(),
     preservedFrom: text("preserved_from"),
     device: text("device"),
     collected: boolean("collected").notNull().default(false),
+    favorite: boolean("favorite").notNull().default(false),
+    lastOpenedAt: timestamp("last_opened_at", { withTimezone: true }),
   },
   (table) => [
     index("quotes_tags_idx").using("gin", table.tags),
-    index("quotes_collection_idx").on(table.collection),
+    index("quotes_collections_idx").using("gin", table.collections),
     index("quotes_saved_date_idx").on(table.savedDate),
   ],
 );

@@ -168,3 +168,45 @@ export function TrashIcon(props: IconProps) {
     </svg>
   );
 }
+
+export function HeartIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M12 20.5C6.5 17.2 3 13.6 3 9.9 3 7.1 5.2 4.9 8 4.9c1.7 0 3.2.8 4 2.1.8-1.3 2.3-2.1 4-2.1 2.8 0 5 2.2 5 5 0 3.7-3.5 7.3-9 10.7z" />
+    </svg>
+  );
+}
+
+export function ShuffleIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M16 3h5v5" />
+      <path d="M4 20 21 3" />
+      <path d="M21 16v5h-5" />
+      <path d="m15 15 6 6" />
+      <path d="M4 4l5 5" />
+    </svg>
+  );
+}
+
+export function SlidersIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M4 8h9" />
+      <path d="M17 8h3" />
+      <circle cx="15" cy="8" r="2" />
+      <path d="M4 16h3" />
+      <path d="M11 16h9" />
+      <circle cx="9" cy="16" r="2" />
+    </svg>
+  );
+}
+
+export function TagIcon(props: IconProps) {
+  return (
+    <svg {...base(props)}>
+      <path d="M20.5 13.4 13.4 20.5a2 2 0 0 1-2.8 0l-7.1-7.1a2 2 0 0 1-.6-1.4V4.5h7.5a2 2 0 0 1 1.4.6l7.1 7.1a2 2 0 0 1 0 2.8z" />
+      <circle cx="7.5" cy="7.5" r="1" />
+    </svg>
+  );
+}

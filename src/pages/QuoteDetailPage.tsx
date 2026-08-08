@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toPng } from "html-to-image";
 import { useQuotes } from "../store/quotes";
@@ -11,19 +11,67 @@ import {
   BookmarkIcon,
   DownloadIcon,
   EditIcon,
+  HeartIcon,
+  PlusIcon,
+  ShuffleIcon,
   TrashIcon,
+  XIcon,
 } from "../components/icons";
 import { countWords, formatDate, slugify } from "../utils/format";
 
 export default function QuoteDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { quotes, getQuote, toggleCollected, deleteQuote } = useQuotes();
+  const {
+    quotes,
+    getQuote,
+    toggleCollected,
+    toggleFavorite,
+    deleteQuote,
+    setCollections,
+    touchQuote,
+  } = useQuotes();
   const [exporting, setExporting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [collectionInput, setCollectionInput] = useState("");
   const exportRef = useRef<HTMLDivElement>(null);
+  const touchedRef = useRef<string | null>(null);
 
-  const quote = id ? getQuote(id) : undefined;
+  const ordered = useMemo(
+    () => [...quotes].sort((a, b) => b.savedDate.localeCompare(a.savedDate)),
+    [quotes],
+  );
+  const index = ordered.findIndex((q) => q.id === id);
+  const quote = index >= 0 ? ordered[index] : id ? getQuote(id) : undefined;
+  const prev = index > 0 ? ordered[index - 1] : undefined;
+  const next = index >= 0 && index < ordered.length - 1 ? ordered[index + 1] : undefined;
+  const total = ordered.length;
+  const position = index >= 0 ? index + 1 : 0;
+
+  useEffect(() => {
+    if (!id || touchedRef.current === id) return;
+    touchedRef.current = id;
+    touchQuote(id).catch(() => {});
+  }, [id, touchQuote]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const target = e.target as HTMLElement;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      )
+        return;
+      if (e.key === "ArrowLeft" && prev) navigate(`/quotes/${prev.id}`);
+      if (e.key === "ArrowRight" && next) navigate(`/quotes/${next.id}`);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [prev, next, navigate]);
 
   const handleExport = async () => {
     const node = exportRef.current;
@@ -61,6 +109,30 @@ export default function QuoteDetailPage() {
     }
   };
 
+  const addCollection = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!quote) return;
+    const clean = collectionInput.trim();
+    if (!clean) return;
+    const next = Array.from(new Set([...(quote.collections ?? []), clean]));
+    setCollectionInput("");
+    try {
+      await setCollections(quote.id, next);
+    } catch (err) {
+      console.error("Failed to update collections", err);
+    }
+  };
+
+  const removeCollection = async (name: string) => {
+    if (!quote) return;
+    const next = (quote.collections ?? []).filter((c) => c !== name);
+    try {
+      await setCollections(quote.id, next);
+    } catch (err) {
+      console.error("Failed to update collections", err);
+    }
+  };
+
   if (!quote) {
     return (
       <div>
@@ -81,9 +153,13 @@ export default function QuoteDetailPage() {
     );
   }
 
-  const related = quote.collection
+  const favorite = !!quote.favorite;
+  const collected = !!quote.collected;
+  const related = quote.collections?.length
     ? quotes.filter(
-        (q) => q.collection === quote.collection && q.id !== quote.id,
+        (q) =>
+          q.id !== quote.id &&
+          (q.collections ?? []).some((c) => quote.collections!.includes(c)),
       )
     : [];
   const words = countWords(quote.text);
@@ -102,13 +178,34 @@ export default function QuoteDetailPage() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
-            onClick={handleExport}
-            disabled={exporting}
+            onClick={() => navigate("/rediscover", { state: { excludeId: quote.id } })}
             className="btn-ghost"
+            title="Surprise me with another line"
           >
-            <DownloadIcon className="h-4 w-4" />
-            {exporting ? "Preparing…" : "Export image"}
+            <ShuffleIcon className="h-4 w-4" />
+            Surprise me
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              toggleFavorite(quote.id).catch((err) =>
+                console.error("Failed to toggle favorite", err),
+              );
+            }}
+            className={`btn-ghost ${favorite ? "border-accent! text-accent-deep!" : ""}`}
+          >
+            <HeartIcon
+              className={`h-4 w-4 ${favorite ? "fill-current text-accent" : ""}`}
+            />
+            {favorite ? "Favorited" : "Favorite"}
+          </button>
+          <Link to={`/add?edit=${quote.id}`} className="btn-ghost">
+            <EditIcon className="h-4 w-4" />
+            Edit
+          </Link>
+
+          <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+
           <button
             type="button"
             onClick={() => {
@@ -116,21 +213,22 @@ export default function QuoteDetailPage() {
                 console.error("Failed to toggle collect", err),
               );
             }}
-            className={`btn-ghost ${
-              quote.collected ? "border-accent! text-accent-deep!" : ""
-            }`}
+            className={`btn-ghost ${collected ? "border-accent! text-accent-deep!" : ""}`}
           >
             <BookmarkIcon
-              className={`h-4 w-4 ${quote.collected ? "fill-accent text-accent" : ""}`}
+              className={`h-4 w-4 ${collected ? "fill-accent text-accent" : ""}`}
             />
-            {quote.collected ? "Collected" : "Collect"}
+            {collected ? "Collected" : "Collect"}
           </button>
-          <Link to={`/add?edit=${quote.id}`} className="btn-ghost">
-            <EditIcon className="h-4 w-4" />
-            Edit entry
-          </Link>
-
-          <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={exporting}
+            className="btn-ghost"
+          >
+            <DownloadIcon className="h-4 w-4" />
+            {exporting ? "Preparing…" : "Export"}
+          </button>
 
           {confirmDelete ? (
             <div className="flex max-w-full flex-wrap items-center justify-end gap-1.5 rounded-full border border-red-200 bg-red-50 py-1.5 pl-4 pr-1.5 dark:border-red-800/50 dark:bg-red-950/40">
@@ -193,12 +291,25 @@ export default function QuoteDetailPage() {
             {quote.work && (
               <p className="mt-1 text-sm text-ink-faint">{quote.work}</p>
             )}
-            <div className="mt-5 inline-flex items-center gap-3">
+            <div className="mt-5 inline-flex flex-wrap items-center justify-center gap-3">
               <SourceChip type={quote.sourceType} />
               <span className="text-[12px] tracking-wide text-ink-faint">
                 Saved {formatDate(quote.savedDate)}
               </span>
             </div>
+            {quote.tags.length > 0 && (
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                {quote.tags.map((tag) => (
+                  <Link
+                    key={tag}
+                    to={`/library?tag=${encodeURIComponent(tag)}`}
+                    className="chip hover:border-accent/50 hover:text-accent-deep"
+                  >
+                    #{tag}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -249,38 +360,51 @@ export default function QuoteDetailPage() {
                 <dd className="min-w-0 flex-1 break-words text-right font-medium text-ink-soft">{v}</dd>
               </div>
             ))}
-            {quote.collection && (
-              <div className="flex items-start justify-between gap-4">
-                <dt className="shrink-0 text-ink-faint">Collection</dt>
-                <dd>
-                  <Link
-                    to={`/library?collection=${encodeURIComponent(quote.collection)}`}
-                    className="inline-flex items-center gap-1 font-medium text-accent-deep transition hover:text-ink"
-                  >
-                    {quote.collection}
-                    <ArrowRightIcon className="h-3.5 w-3.5" />
-                  </Link>
-                </dd>
-              </div>
-            )}
           </dl>
+
+          <div className="mt-6 border-t border-border/70 pt-5">
+            <p className="eyebrow">Collections</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {(quote.collections ?? []).length === 0 && (
+                <p className="text-[13px] text-ink-faint">
+                  Not in any collection yet.
+                </p>
+              )}
+              {(quote.collections ?? []).map((c) => (
+                <span
+                  key={c}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-accent/40 bg-accent-soft px-3 py-1 text-[12px] font-medium text-accent-deep"
+                >
+                  {c}
+                  <button
+                    type="button"
+                    aria-label={`Remove from ${c}`}
+                    onClick={() => removeCollection(c)}
+                    className="text-accent-deep/70 transition hover:text-ink"
+                  >
+                    <XIcon className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+            <form onSubmit={addCollection} className="mt-3 flex items-center gap-2">
+              <input
+                value={collectionInput}
+                onChange={(e) => setCollectionInput(e.target.value)}
+                placeholder="Add a collection…"
+                className="min-w-0 flex-1 rounded-full border border-dashed border-border-strong bg-card px-4 py-1.5 text-[13px] text-ink outline-none transition placeholder:text-ink-faint focus:border-accent focus:ring-4 focus:ring-accent/15"
+              />
+              <button
+                type="submit"
+                aria-label="Add collection"
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-white transition hover:bg-accent-deep"
+              >
+                <PlusIcon className="h-3.5 w-3.5" />
+              </button>
+            </form>
+          </div>
         </aside>
       </div>
-
-      {quote.tags.length > 0 && (
-        <div className="animate-rise mt-6 flex flex-wrap items-center gap-2">
-          <span className="eyebrow mr-1">Tags</span>
-          {quote.tags.map((tag) => (
-            <Link
-              key={tag}
-              to={`/search?tag=${encodeURIComponent(tag)}`}
-              className="chip hover:border-accent/50 hover:text-accent-deep"
-            >
-              #{tag}
-            </Link>
-          ))}
-        </div>
-      )}
 
       {related.length > 0 && (
         <section
@@ -290,15 +414,15 @@ export default function QuoteDetailPage() {
           <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
             <div>
               <h2 className="font-serif text-[24px] tracking-tight text-ink">
-                From the same collection
+                From the same collections
               </h2>
               <p className="mt-1 text-[13px] text-ink-faint">
-                “{quote.collection}” — {related.length} more{" "}
+                {(quote.collections ?? []).join(" · ")} — {related.length} more{" "}
                 {related.length === 1 ? "line" : "lines"}
               </p>
             </div>
             <Link
-              to={`/library?collection=${encodeURIComponent(quote.collection!)}`}
+              to={`/library?collection=${encodeURIComponent((quote.collections ?? [])[0] ?? "")}`}
               className="inline-flex items-center gap-1.5 text-sm text-ink-soft transition hover:text-accent-deep"
             >
               View all <ArrowRightIcon className="h-4 w-4" />
@@ -311,6 +435,33 @@ export default function QuoteDetailPage() {
           </div>
         </section>
       )}
+
+      <div
+        className="animate-rise mt-10 flex items-center justify-between gap-4 border-t border-border/80 pt-6"
+        style={{ animationDelay: "200ms" }}
+      >
+        <button
+          type="button"
+          disabled={!prev}
+          onClick={() => prev && navigate(`/quotes/${prev.id}`)}
+          className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm text-ink-soft transition hover:text-ink disabled:cursor-default disabled:opacity-35 disabled:hover:text-ink-soft"
+        >
+          <ArrowLeftIcon className="h-4 w-4" />
+          <span className="hidden sm:inline">Previous</span>
+        </button>
+        <p className="font-serif text-lg text-ink-soft">
+          {position} <span className="text-ink-faint">/ {total}</span>
+        </p>
+        <button
+          type="button"
+          disabled={!next}
+          onClick={() => next && navigate(`/quotes/${next.id}`)}
+          className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm text-ink-soft transition hover:text-ink disabled:cursor-default disabled:opacity-35 disabled:hover:text-ink-soft"
+        >
+          <span className="hidden sm:inline">Next</span>
+          <ArrowRightIcon className="h-4 w-4" />
+        </button>
+      </div>
 
       <div
         ref={exportRef}

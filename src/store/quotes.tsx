@@ -12,7 +12,11 @@ interface QuotesContextValue {
   quotes: Quote[];
   loading: boolean;
   addQuote: (data: QuoteInput, id?: string) => Promise<Quote>;
+  updateQuote: (id: string, patch: Partial<Quote>) => Promise<Quote>;
   toggleCollected: (id: string) => Promise<void>;
+  toggleFavorite: (id: string) => Promise<void>;
+  setCollections: (id: string, collections: string[]) => Promise<void>;
+  touchQuote: (id: string) => Promise<void>;
   deleteQuote: (id: string) => Promise<void>;
   getQuote: (id: string) => Quote | undefined;
   collections: string[];
@@ -76,14 +80,36 @@ export function QuotesProvider({ children }: { children: ReactNode }) {
     return created;
   };
 
+  const updateQuote = async (
+    id: string,
+    patch: Partial<Quote>,
+  ): Promise<Quote> => {
+    const updated = await request<Quote>(`${API}/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(patch),
+    });
+    setQuotes((qs) => qs.map((q) => (q.id === id ? updated : q)));
+    return updated;
+  };
+
   const toggleCollected = async (id: string) => {
     const current = quotes.find((q) => q.id === id);
     if (!current) return;
-    const updated = await request<Quote>(`${API}/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ collected: !current.collected }),
-    });
-    setQuotes((qs) => qs.map((q) => (q.id === id ? updated : q)));
+    await updateQuote(id, { collected: !current.collected });
+  };
+
+  const toggleFavorite = async (id: string) => {
+    const current = quotes.find((q) => q.id === id);
+    if (!current) return;
+    await updateQuote(id, { favorite: !current.favorite });
+  };
+
+  const setCollections = async (id: string, collections: string[]) => {
+    await updateQuote(id, { collections });
+  };
+
+  const touchQuote = async (id: string) => {
+    await updateQuote(id, { lastOpenedAt: new Date().toISOString() });
   };
 
   const deleteQuote = async (id: string) => {
@@ -96,8 +122,8 @@ export function QuotesProvider({ children }: { children: ReactNode }) {
   const collections = useMemo(
     () =>
       Array.from(
-        new Set(quotes.map((q) => q.collection).filter(Boolean)),
-      ) as string[],
+        new Set(quotes.flatMap((q) => q.collections ?? [])),
+      ).sort((a, b) => a.localeCompare(b)),
     [quotes],
   );
 
@@ -113,7 +139,11 @@ export function QuotesProvider({ children }: { children: ReactNode }) {
     quotes,
     loading,
     addQuote,
+    updateQuote,
     toggleCollected,
+    toggleFavorite,
+    setCollections,
+    touchQuote,
     deleteQuote,
     getQuote,
     collections,

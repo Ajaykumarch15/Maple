@@ -35,7 +35,7 @@ export default function AddQuotePage() {
   const [reflection, setReflection] = useState(editing?.reflection ?? "");
   const [tags, setTags] = useState<string[]>(editing?.tags ?? []);
   const [tagInput, setTagInput] = useState("");
-  const [collection, setCollection] = useState(editing?.collection ?? "");
+  const [collection, setCollection] = useState(editing?.collections?.[0] ?? "");
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function AddQuotePage() {
           author: author.trim() || undefined,
           reflection: reflection.trim() || undefined,
           tags,
-          collection: collection.trim() || undefined,
+          collections: collection.trim() ? [collection.trim()] : [],
         },
         editId ?? undefined,
       );
