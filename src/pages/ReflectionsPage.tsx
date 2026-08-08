@@ -77,7 +77,7 @@ export default function ReflectionsPage() {
                   className="pointer-events-none absolute inset-0"
                   style={{
                     background:
-                      "radial-gradient(110% 90% at 15% 0%, rgba(176,103,95,0.07), transparent 55%), radial-gradient(100% 80% at 100% 100%, rgba(169,132,61,0.06), transparent 55%)",
+                      "radial-gradient(110% 90% at 15% 0%, rgba(255,60,172,0.07), transparent 55%), radial-gradient(100% 80% at 100% 100%, rgba(139,92,255,0.08), transparent 55%)",
                   }}
                   aria-hidden="true"
                 />
@@ -85,7 +85,7 @@ export default function ReflectionsPage() {
                   className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                   style={{
                     background:
-                      "radial-gradient(110% 90% at 15% 0%, rgba(176,103,95,0.14), transparent 55%)",
+                      "radial-gradient(110% 90% at 15% 0%, rgba(255,60,172,0.14), transparent 55%), radial-gradient(100% 80% at 100% 100%, rgba(0,229,255,0.08), transparent 55%)",
                   }}
                   aria-hidden="true"
                 />
@@ -96,7 +96,7 @@ export default function ReflectionsPage() {
                   </span>
                 </div>
 
-                <p className="relative mt-6 font-cormorant text-[22px] italic leading-[1.55] text-ink">
+                <p className="relative mt-6 font-cormorant text-[22px] italic leading-[1.55] text-[#f3f1ff] transition-colors duration-300 group-hover:text-white">
                   “{q.reflection}”
                 </p>
 

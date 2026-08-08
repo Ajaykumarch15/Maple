@@ -10,9 +10,13 @@ export default function Sidebar() {
   const isDark = theme === "dark";
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col border-r border-border bg-sidebar lg:flex">
+    <aside className="glass fixed inset-y-0 left-0 z-30 hidden w-[264px] flex-col border-r border-border lg:flex">
       <div
         className="pointer-events-none absolute inset-0 ambient-noise"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-44 ambient-drift"
         aria-hidden="true"
       />
       <div className="px-7 pb-6 pt-8">
@@ -24,7 +28,7 @@ export default function Sidebar() {
           <span className="font-serif text-[28px] leading-none tracking-tight text-ink transition-colors duration-300 group-hover:text-accent-deep">
             Maple
           </span>
-          <span className="font-serif text-[28px] leading-none text-accent transition-transform duration-300 group-hover:translate-x-0.5">
+          <span className="bg-gradient-primary bg-clip-text font-serif text-[28px] leading-none text-transparent transition-transform duration-300 group-hover:translate-x-0.5">
             .
           </span>
         </Link>
@@ -47,10 +51,10 @@ export default function Sidebar() {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-colors duration-200 ${
+                `group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-all duration-200 ${
                   isActive
-                    ? "bg-accent-soft font-medium text-ink"
-                    : "text-ink-soft hover:bg-card/55 hover:text-ink"
+                    ? "bg-gradient-primary font-medium text-white shadow-[0_10px_24px_-10px_rgba(139,92,255,0.85)]"
+                    : "text-ink-soft hover:bg-card/60 hover:text-ink"
                 }`
               }
             >
@@ -58,16 +62,16 @@ export default function Sidebar() {
                 <>
                   <span
                     aria-hidden="true"
-                    className={`pointer-events-none absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-accent transition-all duration-300 ${
+                    className={`pointer-events-none absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full transition-all duration-300 ${
                       isActive
-                        ? "translate-x-0 opacity-100"
-                        : "-translate-x-1 opacity-0"
+                        ? "bg-white translate-x-0 opacity-100"
+                        : "bg-accent -translate-x-1 opacity-0"
                     }`}
                   />
                   <Icon
                     className={`h-[18px] w-[18px] transition-all duration-200 ${
                       isActive
-                        ? "text-accent"
+                        ? "text-white"
                         : "text-ink-faint group-hover:translate-x-px group-hover:text-ink-soft"
                     }`}
                   />
@@ -91,17 +95,17 @@ export default function Sidebar() {
             ) : (
               <SunIcon className="h-[18px] w-[18px] text-ink-faint transition-transform duration-300 group-hover:rotate-45" />
             )}
-            {isDark ? "Midnight" : "Daylight"}
+            {isDark ? "Midnight" : "Graphite"}
           </span>
           <span
             className={`h-2 w-2 rounded-full transition-colors duration-300 ${
-              isDark ? "bg-accent" : "bg-border-strong"
+              isDark ? "bg-accent" : "bg-cyan"
             }`}
             aria-hidden="true"
           />
         </button>
         <p className="px-3.5 pt-3 text-xs leading-relaxed text-ink-faint">
-          <span className="font-serif text-base text-ink">
+          <span className="text-gradient font-serif text-base">
             {stats?.total ?? 0}
           </span>{" "}
           lines kept

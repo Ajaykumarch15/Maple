@@ -72,7 +72,7 @@ function FilterMenu({ label, icon, options, selected, onSelect }: FilterMenuProp
       </button>
 
       {open && (
-        <div className="animate-pop absolute left-0 top-full z-30 mt-2 max-h-80 w-72 overflow-y-auto rounded-2xl border border-border bg-card p-2 shadow-pop">
+        <div className="animate-pop glass absolute left-0 top-full z-30 mt-2 max-h-80 w-72 overflow-y-auto rounded-2xl border border-border p-2 shadow-pop">
           {options.length === 0 ? (
             <p className="px-3 py-3 text-[13px] text-ink-faint">Nothing here yet.</p>
           ) : (
@@ -332,7 +332,7 @@ export default function LibraryPage() {
 
       <div className="animate-rise mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="group relative flex-1">
-          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-faint transition-colors duration-200 group-focus-within:text-accent" />
+          <SearchIcon className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-ink-faint transition-colors duration-200 group-focus-within:text-cyan" />
           <input
             type="text"
             value={query}
@@ -355,7 +355,7 @@ export default function LibraryPage() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="appearance-none rounded-full border border-border bg-card py-2.5 pl-4 pr-9 text-[13px] font-medium text-ink-soft outline-none transition hover:border-ink-soft/40 hover:text-ink focus:ring-4 focus:ring-accent/15"
+            className="appearance-none rounded-full border border-border-strong bg-elevated py-2.5 pl-4 pr-9 text-[13px] font-medium text-ink-soft outline-none transition hover:border-ink-soft/40 hover:text-ink focus:border-accent/60 focus:ring-4 focus:ring-accent/20"
           >
             {SORTS.map((s) => (
               <option key={s.value} value={s.value}>
@@ -374,7 +374,7 @@ export default function LibraryPage() {
             onClick={() => setView("all")}
             className={`rounded-full px-4 py-1.5 text-[12px] font-medium transition ${
               view === "all"
-                ? "bg-accent text-white"
+                ? "bg-gradient-primary text-white shadow-[0_6px_16px_-8px_rgba(139,92,255,0.8)]"
                 : "text-ink-soft hover:text-ink"
             }`}
           >
@@ -385,7 +385,7 @@ export default function LibraryPage() {
             onClick={() => setView("favorites")}
             className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[12px] font-medium transition ${
               view === "favorites"
-                ? "bg-accent text-white"
+                ? "bg-gradient-primary text-white shadow-[0_6px_16px_-8px_rgba(139,92,255,0.8)]"
                 : "text-ink-soft hover:text-ink"
             }`}
           >
@@ -423,7 +423,7 @@ export default function LibraryPage() {
           <SlidersIcon className="h-3.5 w-3.5" />
           Filter
           {activeCount > 0 && (
-            <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-semibold text-white">
+            <span className="bg-gradient-primary inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-semibold text-white">
               {activeCount}
             </span>
           )}
@@ -431,7 +431,7 @@ export default function LibraryPage() {
       </div>
 
       {showPanel && (
-        <div className="animate-rise mt-3 rounded-2xl border border-border bg-card p-5 sm:p-6">
+        <div className="animate-rise glass mt-3 rounded-2xl border border-border p-5 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="eyebrow">Refine your library</p>
             <button
@@ -454,7 +454,7 @@ export default function LibraryPage() {
                     onClick={() => setSource(t)}
                     className={
                       source === t
-                        ? "chip border-accent bg-accent text-white hover:border-accent"
+                        ? "chip border-transparent bg-gradient-primary text-white shadow-[0_6px_16px_-8px_rgba(139,92,255,0.8)]"
                         : "chip hover:border-ink-soft/40 hover:text-ink"
                     }
                   >

@@ -4,6 +4,26 @@ import EmptyState from "../components/EmptyState";
 import Loader from "../components/Loader";
 import { CollectionsIcon, ArrowRightIcon } from "../components/icons";
 
+const GRADIENTS = [
+  "bg-gradient-primary",
+  "bg-gradient-cyan",
+  "bg-gradient-to-br from-[#4d7cff] to-[#8b5cff]",
+  "bg-gradient-spectrum",
+];
+
+const GLOWS = [
+  "rgba(139, 92, 255, 0.18)",
+  "rgba(0, 229, 255, 0.14)",
+  "rgba(77, 124, 255, 0.18)",
+  "rgba(255, 60, 172, 0.18)",
+];
+
+function hashOf(value: string) {
+  let h = 0;
+  for (let i = 0; i < value.length; i++) h = (h * 31 + value.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
 export default function CollectionsPage() {
   const { meta } = useQuotes();
 
@@ -42,43 +62,49 @@ export default function CollectionsPage() {
 
       {entries.length > 0 ? (
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {entries.map((entry, i) => (
-            <Link
-              key={entry.name}
-              to={`/library?collection=${encodeURIComponent(entry.name)}`}
-              className="card card-hover animate-card-in group relative flex h-full flex-col overflow-hidden p-7 hover:border-border-strong"
-              style={{ animationDelay: `${Math.min(i, 7) * 50}ms` }}
-            >
-              <div
-                className="pointer-events-none absolute -left-14 -top-14 h-44 w-44 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
-                style={{
-                  background:
-                    "radial-gradient(circle, rgba(112,138,129,0.16), transparent 65%)",
-                }}
-                aria-hidden="true"
-              />
-              <div className="relative flex items-center justify-between gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent-deep transition-all duration-300 group-hover:-rotate-6 group-hover:scale-105 group-hover:shadow-[0_8px_20px_-8px_rgba(112,138,129,0.5)]">
-                  <CollectionsIcon className="h-5 w-5" />
-                </span>
-                <span className="eyebrow">
-                  {entry.count} {entry.count === 1 ? "line" : "lines"}
-                </span>
-              </div>
-              <h2 className="relative mt-5 font-serif text-[26px] tracking-tight text-ink">
-                {entry.name}
-              </h2>
-              {entry.preview && (
-                <p className="relative mt-3 line-clamp-2 font-cormorant text-[18px] italic leading-relaxed text-ink-soft transition-transform duration-300 group-hover:translate-x-px">
-                  “{entry.preview}”
-                </p>
-              )}
-              <div className="relative mt-6 flex items-center gap-1.5 border-t border-border/80 pt-4 text-sm text-ink-soft transition-colors duration-300 group-hover:text-accent-deep">
-                Open collection
-                <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-              </div>
-            </Link>
-          ))}
+          {entries.map((entry, i) => {
+            const index = hashOf(entry.name) % GRADIENTS.length;
+            const gradient = GRADIENTS[index];
+            const glow = GLOWS[index];
+            return (
+              <Link
+                key={entry.name}
+                to={`/library?collection=${encodeURIComponent(entry.name)}`}
+                className="card card-hover animate-card-in group relative flex h-full flex-col overflow-hidden p-7 hover:border-border-strong"
+                style={{ animationDelay: `${Math.min(i, 7) * 50}ms` }}
+              >
+                <div
+                  className="pointer-events-none absolute -left-14 -top-14 h-44 w-44 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
+                  style={{
+                    background: `radial-gradient(circle, ${glow}, transparent 65%)`,
+                  }}
+                  aria-hidden="true"
+                />
+                <div className="relative flex items-center justify-between gap-3">
+                  <span
+                    className={`${gradient} inline-flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-[0_8px_20px_-8px_rgba(139,92,255,0.7)] transition-all duration-300 group-hover:-rotate-6 group-hover:scale-105`}
+                  >
+                    <CollectionsIcon className="h-5 w-5" />
+                  </span>
+                  <span className="eyebrow">
+                    {entry.count} {entry.count === 1 ? "line" : "lines"}
+                  </span>
+                </div>
+                <h2 className="relative mt-5 font-serif text-[26px] tracking-tight text-ink">
+                  {entry.name}
+                </h2>
+                {entry.preview && (
+                  <p className="relative mt-3 line-clamp-2 font-cormorant text-[18px] italic leading-relaxed text-ink-soft transition-transform duration-300 group-hover:translate-x-px">
+                    “{entry.preview}”
+                  </p>
+                )}
+                <div className="relative mt-6 flex items-center gap-1.5 border-t border-border/80 pt-4 text-sm text-ink-soft transition-colors duration-300 group-hover:text-accent-deep">
+                  Open collection
+                  <ArrowRightIcon className="h-4 w-4 text-cyan transition-transform duration-300 group-hover:translate-x-1" />
+                </div>
+              </Link>
+            );
+          })}
         </div>
       ) : (
         <div className="mt-10">

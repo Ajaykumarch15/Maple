@@ -17,7 +17,7 @@ export default function EmptyState({
   return (
     <div className="card relative overflow-hidden px-8 py-16 text-center">
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-accent/10 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-44 bg-gradient-to-b from-[rgba(139,92,255,0.14)] to-transparent"
         aria-hidden="true"
       />
       <div
@@ -29,11 +29,11 @@ export default function EmptyState({
           className="mb-7 flex items-center justify-center gap-3 text-ink-faint"
           aria-hidden="true"
         >
-          <span className="h-px w-14 bg-gradient-to-r from-transparent to-border-strong" />
-          <span className="font-serif text-2xl leading-none">❧</span>
-          <span className="h-px w-14 bg-gradient-to-l from-transparent to-border-strong" />
+          <span className="h-px w-14 bg-gradient-to-r from-transparent to-accent/60" />
+          <span className="text-gradient font-serif text-2xl leading-none">❧</span>
+          <span className="h-px w-14 bg-gradient-to-l from-transparent to-accent/60" />
         </div>
-        <p className="font-serif text-2xl text-ink">{title}</p>
+        <p className="text-gradient font-serif text-2xl">{title}</p>
         <p className="mx-auto mt-3 max-w-sm text-[15px] leading-relaxed text-ink-soft">
           {body}
         </p>

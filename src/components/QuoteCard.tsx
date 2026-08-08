@@ -58,7 +58,7 @@ export default function QuoteCard({
         className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
-            "radial-gradient(circle, rgba(112,138,129,0.16), transparent 65%)",
+            "radial-gradient(circle, rgba(139,92,255,0.22), transparent 65%)",
         }}
         aria-hidden="true"
       />
@@ -70,9 +70,9 @@ export default function QuoteCard({
           onClick={handleFavorite}
           aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
           aria-pressed={favorite}
-          className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors duration-200 active:scale-90 ${
+          className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-all duration-200 active:scale-90 ${
             favorite
-              ? "bg-accent-soft text-accent-deep shadow-[0_6px_18px_-8px_rgba(112,138,129,0.6)]"
+              ? "bg-rose-soft text-rose shadow-[0_0_18px_-4px_rgba(255,60,172,0.7)]"
               : "text-ink-faint hover:bg-card hover:text-accent-deep"
           }`}
         >
@@ -84,7 +84,7 @@ export default function QuoteCard({
         </button>
       </div>
 
-      <p className="relative mt-5 line-clamp-5 font-serif text-[19px] leading-[1.5] text-ink transition-transform duration-300 group-hover:-translate-y-px">
+      <p className="relative mt-5 line-clamp-5 font-serif text-[19px] leading-[1.5] text-ink transition-[color,transform] duration-300 group-hover:-translate-y-px group-hover:text-[#f5f3ff]">
         “{quote.text}”
       </p>
 
@@ -104,7 +104,7 @@ export default function QuoteCard({
           </div>
           <span className="flex shrink-0 items-center gap-2 text-[11px] tracking-wide text-ink-faint">
             {formatShort(quote.savedDate)}
-            <ArrowRightIcon className="h-4 w-4 -translate-x-1.5 text-accent opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
+            <ArrowRightIcon className="h-4 w-4 -translate-x-1.5 text-cyan opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100" />
           </span>
         </div>
 

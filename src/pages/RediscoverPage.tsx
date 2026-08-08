@@ -33,8 +33,12 @@ export default function RediscoverPage() {
   }, [getRediscover, excludeId, navigate]);
 
   return (
-    <div className="flex items-center justify-center py-28">
-      <Loader copy="Finding a line for you…" />
+    <div className="relative flex items-center justify-center py-28">
+      <div
+        aria-hidden="true"
+        className="animate-pulse-glow pointer-events-none absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-[rgba(139,92,255,0.35)] to-[rgba(0,229,255,0.25)] blur-3xl"
+      />
+      <Loader copy="Finding a line for you…" className="relative" />
     </div>
   );
 }

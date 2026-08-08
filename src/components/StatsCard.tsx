@@ -17,7 +17,7 @@ export default function StatsCard({
       style={{ animationDelay: `${delay}ms` }}
     >
       <p className="eyebrow">{label}</p>
-      <p className="mt-3 font-serif text-[42px] leading-none tracking-tight text-ink">
+      <p className="text-gradient mt-3 font-serif text-[42px] leading-none tracking-tight">
         {value}
       </p>
       <p className="mt-3 text-[13px] leading-relaxed text-ink-soft">{caption}</p>

@@ -144,13 +144,13 @@ export default function AddQuotePage() {
   const confirmationCopy = editing ? "Changes saved to Maple" : "Saved to Maple";
 
   return (
-    <div className="animate-fade fixed inset-0 z-50 overflow-y-auto bg-black/40 backdrop-blur-[3px]">
+    <div className="animate-fade fixed inset-0 z-50 overflow-y-auto bg-black/70 backdrop-blur-md">
       <div
         className="flex min-h-full items-start justify-center p-4 sm:p-8"
         onClick={close}
       >
         <div
-          className="mt-4 w-full max-w-3xl animate-rise rounded-3xl border border-border bg-paper shadow-[0_48px_96px_-28px_rgba(36,33,29,0.5)] sm:mt-10 dark:shadow-[0_48px_96px_-28px_rgba(0,0,0,0.7)]"
+          className="glass mt-4 w-full max-w-3xl animate-rise rounded-3xl border border-border shadow-pop sm:mt-10"
           onClick={(e) => e.stopPropagation()}
           role="dialog"
           aria-modal="true"
@@ -229,7 +229,7 @@ export default function AddQuotePage() {
                         onClick={() => setSourceType(t)}
                         className={
                           sourceType === t
-                            ? "chip border-accent bg-accent text-white hover:border-accent"
+                            ? "chip border-transparent bg-gradient-primary text-white shadow-[0_6px_16px_-8px_rgba(139,92,255,0.8)]"
                             : "chip hover:border-ink-soft/40 hover:text-ink"
                         }
                       >
@@ -311,7 +311,7 @@ export default function AddQuotePage() {
                           ? "Add a tag, press Enter…"
                           : "Add another…"
                       }
-                      className="min-w-[160px] flex-1 rounded-full border border-dashed border-border-strong bg-card px-4 py-1.5 text-[13px] text-ink outline-none transition placeholder:text-ink-faint focus:border-accent focus:ring-4 focus:ring-accent/15"
+                      className="min-w-[160px] flex-1 rounded-full border border-dashed border-border-strong bg-card px-4 py-1.5 text-[13px] text-ink outline-none transition placeholder:text-ink-faint focus:border-cyan/55 focus:ring-4 focus:ring-accent/20"
                     />
                   </div>
                   {suggestions.length > 0 && (
@@ -354,7 +354,7 @@ export default function AddQuotePage() {
                 </div>
 
                 {error && (
-                  <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800/50 dark:bg-red-950/40 dark:text-red-300">
+                  <p className="rounded-xl border border-red-800/50 bg-red-950/40 px-4 py-3 text-sm text-red-300">
                     {error}
                   </p>
                 )}

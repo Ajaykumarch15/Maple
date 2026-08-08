@@ -78,7 +78,7 @@ export default function HomePage() {
         <div>
           <p className="eyebrow">{formatTodayLong()}</p>
           <h1 className="mt-3 font-serif text-[40px] leading-[1.05] tracking-tight text-ink sm:text-[52px]">
-            {greeting()}, Maple.
+            {greeting()}, <span className="text-gradient">Maple.</span>
           </h1>
           <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-soft">
             Every line worth keeping, in one quiet place.{" "}

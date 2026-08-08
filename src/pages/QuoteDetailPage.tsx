@@ -270,10 +270,10 @@ export default function QuoteDetailPage() {
           <button
             type="button"
             onClick={handleToggleFavorite}
-            className={`btn-ghost ${favorite ? "border-accent! text-accent-deep!" : ""}`}
+            className={`btn-ghost ${favorite ? "border-rose! text-rose!" : ""}`}
           >
             <HeartIcon
-              className={`h-4 w-4 ${favorite ? "fill-current text-accent" : ""}`}
+              className={`h-4 w-4 ${favorite ? "fill-current text-rose" : ""}`}
             />
             {favorite ? "Favorited" : "Favorite"}
           </button>
@@ -305,14 +305,14 @@ export default function QuoteDetailPage() {
           </button>
 
           {confirmDelete ? (
-            <div className="flex max-w-full flex-wrap items-center justify-end gap-1.5 rounded-full border border-red-200 bg-red-50 py-1.5 pl-4 pr-1.5 dark:border-red-800/50 dark:bg-red-950/40">
-              <span className="text-sm text-red-700 dark:text-red-300">
+            <div className="flex max-w-full flex-wrap items-center justify-end gap-1.5 rounded-full border border-red-800/50 bg-red-950/50 py-1.5 pl-4 pr-1.5 shadow-[0_0_24px_-10px_rgba(255,60,80,0.6)]">
+              <span className="text-sm text-red-300">
                 Delete this line?
               </span>
               <button
                 type="button"
                 onClick={handleDelete}
-                className="rounded-full bg-red-600 px-3.5 py-1.5 text-sm font-medium text-white transition hover:bg-red-700"
+                className="rounded-full bg-red-600 px-3.5 py-1.5 text-sm font-medium text-white transition hover:bg-red-500"
               >
                 Delete
               </button>
@@ -328,7 +328,7 @@ export default function QuoteDetailPage() {
             <button
               type="button"
               onClick={() => setConfirmDelete(true)}
-              className="btn-ghost text-red-600/90 hover:border-red-300 hover:text-red-600 dark:text-red-400/90 dark:hover:border-red-700/60 dark:hover:text-red-300"
+              className="btn-ghost text-red-400/90 hover:border-red-700/60 hover:text-red-300"
             >
               <TrashIcon className="h-4 w-4" />
               Delete
@@ -338,7 +338,7 @@ export default function QuoteDetailPage() {
       </div>
 
       <div
-        className="animate-rise relative mt-6 overflow-hidden rounded-3xl border border-border bg-card px-5 py-12 shadow-card sm:px-16 sm:py-20"
+        className="animate-rise relative mt-6 overflow-hidden rounded-3xl border border-border bg-card px-5 py-12 shadow-[0_0_70px_-24px_rgba(139,92,255,0.5)] sm:px-16 sm:py-20"
         style={{ animationDelay: "60ms" }}
       >
         <div className="pointer-events-none absolute inset-0" aria-hidden="true">
@@ -347,13 +347,13 @@ export default function QuoteDetailPage() {
         </div>
         <div className="relative mx-auto max-w-3xl text-center">
           <span
-            className="font-cormorant text-[64px] leading-none text-accent"
+            className="text-gradient font-cormorant text-[64px] leading-none"
             aria-hidden="true"
           >
             “
           </span>
           <blockquote
-            className={`mt-1 font-serif text-[28px] leading-[1.3] tracking-tight text-ink sm:text-[36px] lg:text-[40px] ${
+            className={`mt-1 font-serif text-[28px] leading-[1.3] tracking-tight text-[#f3f1ff] sm:text-[36px] lg:text-[40px] ${
               fromRediscover ? "animate-unblur" : ""
             }`}
           >
@@ -467,12 +467,12 @@ export default function QuoteDetailPage() {
                 value={collectionInput}
                 onChange={(e) => setCollectionInput(e.target.value)}
                 placeholder="Add a collection…"
-                className="min-w-0 flex-1 rounded-full border border-dashed border-border-strong bg-card px-4 py-1.5 text-[13px] text-ink outline-none transition placeholder:text-ink-faint focus:border-accent focus:ring-4 focus:ring-accent/15"
+                className="min-w-0 flex-1 rounded-full border border-dashed border-border-strong bg-card px-4 py-1.5 text-[13px] text-ink outline-none transition placeholder:text-ink-faint focus:border-cyan/55 focus:ring-4 focus:ring-accent/20"
               />
               <button
                 type="submit"
                 aria-label="Add collection"
-                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-white transition hover:bg-accent-deep"
+                className="bg-gradient-primary inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white shadow-[0_6px_16px_-8px_rgba(139,92,255,0.8)] transition hover:brightness-110"
               >
                 <PlusIcon className="h-3.5 w-3.5" />
               </button>
