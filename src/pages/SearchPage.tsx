@@ -1,29 +1,68 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuotes } from "../store/quotes";
 import SourceChip from "../components/SourceChip";
 import EmptyState from "../components/EmptyState";
+import { useDebounce } from "../utils/useDebounce";
 import { SearchIcon, XIcon, ArrowRightIcon } from "../components/icons";
 import { formatShort } from "../utils/format";
+import type { Quote } from "../types";
 
 export default function SearchPage() {
-  const { quotes, allTags } = useQuotes();
+  const { fetchQuotes, allTags } = useQuotes();
   const [params, setParams] = useSearchParams();
   const tag = params.get("tag");
   const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 200);
+  const [results, setResults] = useState<Quote[]>([]);
+  const [recent, setRecent] = useState<Quote[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [searched, setSearched] = useState(false);
 
-  const results = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    return quotes
-      .filter((q) => {
-        if (tag && !q.tags.includes(tag)) return false;
-        if (!needle) return true;
-        return [q.text, q.author, q.work, q.reflection, ...q.tags]
-          .filter(Boolean)
-          .some((field) => (field as string).toLowerCase().includes(needle));
+  useEffect(() => {
+    const needle = debouncedQuery.trim();
+    if (!needle && !tag) {
+      setResults([]);
+      setSearched(false);
+      return;
+    }
+    let active = true;
+    setSearching(true);
+    fetchQuotes({
+      search: needle || undefined,
+      tag: tag || undefined,
+      sort: "recent",
+      limit: 100,
+    })
+      .then((res) => {
+        if (!active) return;
+        setResults(res.items);
+        setSearched(true);
       })
-      .sort((a, b) => b.savedDate.localeCompare(a.savedDate));
-  }, [quotes, query, tag]);
+      .catch(() => {
+        if (!active) return;
+        setResults([]);
+        setSearched(true);
+      })
+      .finally(() => {
+        if (active) setSearching(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [debouncedQuery, tag, fetchQuotes]);
+
+  useEffect(() => {
+    let active = true;
+    fetchQuotes({ sort: "recent", limit: 3 })
+      .then((res) => {
+        if (active) setRecent(res.items);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [fetchQuotes]);
 
   const clearTag = () => {
     const next = new URLSearchParams(params);
@@ -31,7 +70,7 @@ export default function SearchPage() {
     setParams(next, { replace: true });
   };
 
-  const showResults = query.trim() !== "" || !!tag;
+  const showResults = query.trim() !== "" || !!tag || searched;
 
   return (
     <div>
@@ -71,7 +110,13 @@ export default function SearchPage() {
       )}
 
       {showResults ? (
-        results.length > 0 ? (
+        searching ? (
+          <div className="card mt-8 max-w-3xl flex items-center justify-center py-16">
+            <p className="font-serif text-lg text-ink-soft">
+              Searching your lines…
+            </p>
+          </div>
+        ) : results.length > 0 ? (
           <div className="mt-8 max-w-3xl space-y-3">
             {results.map((q) => (
               <Link
@@ -137,26 +182,23 @@ export default function SearchPage() {
           >
             <p className="eyebrow mb-4">Recently saved</p>
             <div className="max-w-3xl space-y-3">
-              {quotes
-                .slice(0, 3)
-                .sort((a, b) => b.savedDate.localeCompare(a.savedDate))
-                .map((q) => (
-                  <Link
-                    key={q.id}
-                    to={`/quotes/${q.id}`}
-                    className="card group flex items-center justify-between gap-6 px-6 py-5 transition-all duration-300 hover:border-border-strong"
-                  >
-                    <div className="min-w-0">
-                      <p className="line-clamp-1 font-serif text-[18px] text-ink">
-                        “{q.text}”
-                      </p>
-                      <p className="mt-1.5 text-xs text-ink-faint">
-                        {[q.author, q.work].filter(Boolean).join(" · ")}
-                      </p>
-                    </div>
-                    <ArrowRightIcon className="h-5 w-5 shrink-0 text-ink-faint transition group-hover:translate-x-0.5 group-hover:text-accent" />
-                  </Link>
-                ))}
+              {recent.map((q) => (
+                <Link
+                  key={q.id}
+                  to={`/quotes/${q.id}`}
+                  className="card group flex items-center justify-between gap-6 px-6 py-5 transition-all duration-300 hover:border-border-strong"
+                >
+                  <div className="min-w-0">
+                    <p className="line-clamp-1 font-serif text-[18px] text-ink">
+                      “{q.text}”
+                    </p>
+                    <p className="mt-1.5 text-xs text-ink-faint">
+                      {[q.author, q.work].filter(Boolean).join(" · ")}
+                    </p>
+                  </div>
+                  <ArrowRightIcon className="h-5 w-5 shrink-0 text-ink-faint transition group-hover:translate-x-0.5 group-hover:text-accent" />
+                </Link>
+              ))}
             </div>
           </section>
         </>

@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuotes } from "../store/quotes";
 import QuoteCard from "../components/QuoteCard";
@@ -10,10 +11,50 @@ import {
   ArrowRightIcon,
 } from "../components/icons";
 import { dailyIndex, formatTodayLong, greeting } from "../utils/format";
+import type { Quote } from "../types";
 
 export default function HomePage() {
-  const { quotes, loading } = useQuotes();
-  const featured = quotes[dailyIndex(quotes.length)];
+  const { fetchQuotes, stats, statsReady } = useQuotes();
+  const [featured, setFeatured] = useState<Quote | null>(null);
+  const [recent, setRecent] = useState<Quote[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    if (!statsReady) return;
+    let active = true;
+    const total = stats?.total ?? 0;
+
+    if (total === 0) {
+      setFeatured(null);
+      setRecent([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    Promise.all([
+      fetchQuotes({ sort: "recent", limit: 4 }),
+      fetchQuotes({ sort: "recent", limit: 1, page: dailyIndex(total) + 1 }),
+    ])
+      .then(([rec, feat]) => {
+        if (!active) return;
+        setRecent(rec.items);
+        setFeatured(feat.items[0] ?? null);
+        setFailed(false);
+      })
+      .catch(() => {
+        if (!active) return;
+        setFailed(true);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [fetchQuotes, stats?.total, statsReady]);
 
   if (loading) {
     return (
@@ -25,14 +66,9 @@ export default function HomePage() {
     );
   }
 
-  const reflectionCount = quotes.filter((q) => q.reflection?.trim()).length;
-  const collectionCount = new Set(
-    quotes.flatMap((q) => q.collections ?? []).filter(Boolean),
-  ).size;
-
-  const recent = [...quotes]
-    .sort((a, b) => b.savedDate.localeCompare(a.savedDate))
-    .slice(0, 4);
+  const total = stats?.total ?? 0;
+  const reflectionCount = stats?.reflections ?? 0;
+  const collectionCount = stats?.collections ?? 0;
 
   return (
     <div>
@@ -47,8 +83,8 @@ export default function HomePage() {
           </h1>
           <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-soft">
             Every line worth keeping, in one quiet place.{" "}
-            <span className="text-ink">{quotes.length}</span> saved so far — let
-            one of them find you tonight.
+            <span className="text-ink">{total}</span> saved so far — let one of
+            them find you tonight.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -63,7 +99,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      {featured && (
+      {featured && !failed && (
         <section
           className="animate-rise mt-10"
           style={{ animationDelay: "60ms" }}
@@ -82,7 +118,7 @@ export default function HomePage() {
       >
         <StatsCard
           label="Saved lines"
-          value={quotes.length}
+          value={total}
           caption="The words you chose to keep"
         />
         <StatsCard
@@ -95,7 +131,7 @@ export default function HomePage() {
           value={reflectionCount}
           caption={
             reflectionCount > 0
-              ? `Your own words beside ${reflectionCount} of ${quotes.length} lines`
+              ? `Your own words beside ${reflectionCount} of ${total} lines`
               : "Your own words beside the lines you keep"
           }
         />

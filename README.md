@@ -88,6 +88,55 @@ The schema is versioned through Drizzle migrations in `server/db/migrations/`:
 2. Apply it with `npm run db:migrate` (recommended, tested against both an existing and a fresh database).
 3. Optional `npm run db:push` pushes the schema directly without a migration file — but it can fail with `column "id" is in a primary key` on some Drizzle/Postgres combos, so prefer `db:migrate`.
 
+## API
+
+The Express server exposes `GET /api/quotes` and friends. The browser never
+receives the full table — every list is paginated, filtered, and sorted
+server-side, so the app stays responsive with 1,000+ quotes.
+
+### `GET /api/quotes`
+
+Query parameters (all optional, all combinable):
+
+| Param        | Description                                                            |
+| ------------ | ---------------------------------------------------------------------- |
+| `search`     | Case-insensitive match across text, author, work, reflection, tags, collections |
+| `sourceType` | One of `Book`, `Movie`, `Song`, `Conversation`, `My Own`, `Other`      |
+| `author`     | Case-insensitive author substring                                      |
+| `collection` | Exact collection membership (multi-collection aware)                   |
+| `tag`        | Exact tag membership                                                   |
+| `favorite`   | `true` or `false`                                                      |
+| `dateFrom`   | `YYYY-MM-DD` (inclusive, local start-of-day)                           |
+| `dateTo`     | `YYYY-MM-DD` (inclusive, local end-of-day)                             |
+| `sort`       | `recent` (default), `oldest`, `author`, `work`, `favorites`            |
+| `page`       | 1-based page number (default `1`, clamped to the last page)            |
+| `limit`      | Rows per page (default `30`, max `100`)                                |
+
+Response:
+
+```json
+{
+  "items": [ /* Quote rows */ ],
+  "pagination": { "page": 1, "limit": 30, "total": 14, "totalPages": 1 }
+}
+```
+
+Sort orders map to fixed columns (never raw input) and always tie-break on
+`id`, so rows never jump between pages.
+
+### Other endpoints
+
+| Endpoint                 | Description                                                             |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `GET /api/quotes/stats`  | `{ total, favorites, reflections, collections }`                        |
+| `GET /api/quotes/meta`   | Distinct collections (with count + preview), tags, and authors          |
+| `GET /api/quotes/rediscover` | `{ quote }` weighted toward least-recently-opened lines; optional `?exclude=<uuid>` |
+| `GET /api/quotes/:id/context` | `{ prevId, nextId, position, total }` in reading mode without downloading the list |
+| `GET /api/quotes/:id`    | Single quote                                                            |
+| `POST /api/quotes`       | Create a quote                                                          |
+| `PATCH /api/quotes/:id`  | Partial update (text, sourceType, work, author, reflection, tags, collections, collected, favorite, lastOpenedAt) |
+| `DELETE /api/quotes/:id` | Delete a quote                                                          |
+
 ## Project Structure
 
 ```

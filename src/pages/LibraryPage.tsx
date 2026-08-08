@@ -5,7 +5,7 @@ import QuoteCard from "../components/QuoteCard";
 import EmptyState from "../components/EmptyState";
 import { useDebounce } from "../utils/useDebounce";
 import { SOURCE_TYPES } from "../types";
-import type { SourceType } from "../types";
+import type { QuoteQueryParams, SourceType } from "../types";
 import {
   ChevronDownIcon,
   CollectionsIcon,
@@ -113,7 +113,20 @@ function FilterMenu({ label, icon, options, selected, onSelect }: FilterMenuProp
 }
 
 export default function LibraryPage() {
-  const { quotes, loading, toggleFavorite } = useQuotes();
+  const {
+    quotes,
+    loading,
+    toggleFavorite,
+    loadLibrary,
+    goToPage,
+    total,
+    page,
+    totalPages,
+    limit,
+    collections: allCollections,
+    allTags,
+    meta,
+  } = useQuotes();
   const [params, setParams] = useSearchParams();
 
   const [query, setQuery] = useState("");
@@ -131,8 +144,6 @@ export default function LibraryPage() {
   const [dateTo, setDateTo] = useState("");
   const [sort, setSort] = useState<SortKey>("recent");
   const [showPanel, setShowPanel] = useState(false);
-  const [visible, setVisible] = useState(PAGE_SIZE);
-  const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setCollection(params.get("collection") ?? undefined);
@@ -158,129 +169,31 @@ export default function LibraryPage() {
     setParams(next, { replace: true });
   };
 
-  const allCollections = useMemo(
-    () =>
-      Array.from(
-        new Set(quotes.flatMap((q) => q.collections ?? [])),
-      ).sort((a, b) => a.localeCompare(b)),
-    [quotes],
-  );
-
   const allAuthors = useMemo(
-    () =>
-      Array.from(new Set(quotes.map((q) => q.author).filter(Boolean))).sort(
-        (a, b) => (a as string).localeCompare(b as string),
-      ),
-    [quotes],
+    () => (meta ? meta.authors : []),
+    [meta],
   );
 
-  const allTags = useMemo(
-    () =>
-      Array.from(new Set(quotes.flatMap((q) => q.tags))).sort((a, b) =>
-        a.localeCompare(b),
-      ),
-    [quotes],
-  );
-
-  const filtered = useMemo(() => {
-    const needle = debouncedQuery.trim().toLowerCase();
-    const authorNeedle = author.trim().toLowerCase();
-
-    let result = quotes.filter((q) => {
-      if (view === "favorites" && !q.favorite) return false;
-      if (collection && !(q.collections ?? []).includes(collection)) return false;
-      if (tag && !q.tags.includes(tag)) return false;
-      if (source !== "All" && q.sourceType !== source) return false;
-      if (authorNeedle && !(q.author ?? "").toLowerCase().includes(authorNeedle))
-        return false;
-      if (dateFrom && q.savedDate < new Date(`${dateFrom}T00:00:00`).toISOString())
-        return false;
-      if (dateTo && q.savedDate > new Date(`${dateTo}T23:59:59`).toISOString())
-        return false;
-      if (needle) {
-        const hay = [
-          q.text,
-          q.author,
-          q.work,
-          q.reflection,
-          ...q.tags,
-          ...(q.collections ?? []),
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-        if (!hay.includes(needle)) return false;
-      }
-      return true;
-    });
-
-    result = result.sort((a, b) => {
-      switch (sort) {
-        case "oldest":
-          return a.savedDate.localeCompare(b.savedDate);
-        case "author":
-          return (
-            (a.author ?? "").localeCompare(b.author ?? "") ||
-            b.savedDate.localeCompare(a.savedDate)
-          );
-        case "work":
-          return (
-            (a.work ?? "").localeCompare(b.work ?? "") ||
-            b.savedDate.localeCompare(a.savedDate)
-          );
-        case "favorites":
-          return (
-            Number(!!b.favorite) - Number(!!a.favorite) ||
-            b.savedDate.localeCompare(a.savedDate)
-          );
-        default:
-          return b.savedDate.localeCompare(a.savedDate);
-      }
-    });
-
-    return result;
-  }, [
-    quotes,
-    debouncedQuery,
-    view,
-    collection,
-    tag,
-    source,
-    author,
-    dateFrom,
-    dateTo,
-    sort,
-  ]);
+  const queryFor = useMemo<QuoteQueryParams>(() => {
+    const trimmedSearch = debouncedQuery.trim();
+    return {
+      search: trimmedSearch || undefined,
+      sourceType: source === "All" ? undefined : source,
+      author: author.trim() || undefined,
+      collection,
+      tag,
+      favorite: view === "favorites" ? "true" : undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+      sort,
+      page: 1,
+      limit: PAGE_SIZE,
+    };
+  }, [debouncedQuery, source, author, collection, tag, view, dateFrom, dateTo, sort]);
 
   useEffect(() => {
-    setVisible(PAGE_SIZE);
-  }, [
-    debouncedQuery,
-    view,
-    collection,
-    tag,
-    source,
-    author,
-    dateFrom,
-    dateTo,
-    sort,
-  ]);
-
-  const hasMore = visible < filtered.length;
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el || !hasMore) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setVisible((v) => v + PAGE_SIZE);
-        }
-      },
-      { rootMargin: "600px 0px" },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasMore, filtered.length, visible]);
+    loadLibrary(queryFor);
+  }, [queryFor, loadLibrary]);
 
   const activeCount = [
     view === "favorites",
@@ -375,29 +288,33 @@ export default function LibraryPage() {
     </>
   );
 
-  const emptyTitle =
-    quotes.length === 0
-      ? "Your library is empty."
-      : view === "favorites"
-        ? "No favorites yet."
-        : collection
-          ? "This collection is waiting for its first line."
-          : "No lines found.";
-  const emptyBody =
-    quotes.length === 0
-      ? "Save a line worth keeping and it will appear here."
-      : view === "favorites"
-        ? "Tap the heart on any quote to keep it close."
-        : collection
-          ? "Save a line into this collection and it will appear here."
-          : "Try another word, author, tag, or collection.";
+  const emptyLibrary = total === 0 && activeCount === 0;
+  const emptyTitle = emptyLibrary
+    ? "Your library is empty."
+    : view === "favorites"
+      ? "No favorites yet."
+      : collection
+        ? "This collection is waiting for its first line."
+        : "No lines found.";
+  const emptyBody = emptyLibrary
+    ? "Save a line worth keeping and it will appear here."
+    : view === "favorites"
+      ? "Tap the heart on any quote to keep it close."
+      : collection
+        ? "Save a line into this collection and it will appear here."
+        : "Try another word, author, tag, or collection.";
+
+  const shownStart = total === 0 ? 0 : (page - 1) * limit + 1;
+  const shownEnd = Math.min(page * limit, total);
+  const hasPrevious = page > 1;
+  const hasNext = page < totalPages;
 
   return (
     <div>
       <header className="animate-rise flex flex-wrap items-end justify-between gap-6">
         <div>
           <p className="eyebrow">
-            {filtered.length} {filtered.length === 1 ? "line" : "lines"} kept
+            {total} {total === 1 ? "line" : "lines"} kept
           </p>
           <h1 className="mt-2 font-serif text-[40px] leading-none tracking-tight text-ink sm:text-[46px]">
             Your Library
@@ -561,7 +478,7 @@ export default function LibraryPage() {
               />
               <datalist id="filter-authors">
                 {allAuthors.map((a) => (
-                  <option key={a} value={a as string} />
+                  <option key={a} value={a} />
                 ))}
               </datalist>
             </div>
@@ -650,10 +567,10 @@ export default function LibraryPage() {
             Gathering your lines…
           </p>
         </div>
-      ) : filtered.length > 0 ? (
+      ) : quotes.length > 0 ? (
         <>
           <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.slice(0, visible).map((quote) => (
+            {quotes.map((quote) => (
               <QuoteCard
                 key={quote.id}
                 quote={quote}
@@ -665,20 +582,40 @@ export default function LibraryPage() {
               />
             ))}
           </div>
-          {hasMore && (
-            <div ref={sentinelRef} className="flex justify-center py-10">
-              <p className="text-[13px] text-ink-faint">
-                Loading more lines…
-              </p>
+          <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-border/80 pt-6 sm:flex-row">
+            <p className="text-[13px] text-ink-faint">
+              Showing {shownStart}–{shownEnd} of {total}{" "}
+              {total === 1 ? "line" : "lines"}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={!hasPrevious}
+                onClick={() => goToPage(page - 1)}
+                className="chip hover:border-ink-soft/40 hover:text-ink disabled:cursor-default disabled:opacity-35 disabled:hover:border-border disabled:hover:text-ink-soft"
+              >
+                Previous
+              </button>
+              <span className="text-[13px] text-ink-soft">
+                Page {page} of {Math.max(totalPages, 1)}
+              </span>
+              <button
+                type="button"
+                disabled={!hasNext}
+                onClick={() => goToPage(page + 1)}
+                className="chip hover:border-ink-soft/40 hover:text-ink disabled:cursor-default disabled:opacity-35 disabled:hover:border-border disabled:hover:text-ink-soft"
+              >
+                Next
+              </button>
             </div>
-          )}
+          </div>
         </>
       ) : (
         <div className="mt-8">
           <EmptyState
             title={emptyTitle}
             body={emptyBody}
-            ctaLabel={quotes.length === 0 ? "New Save" : undefined}
+            ctaLabel={emptyLibrary ? "New Save" : undefined}
             ctaTo="/add"
           />
         </div>

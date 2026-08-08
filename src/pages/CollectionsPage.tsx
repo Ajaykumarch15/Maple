@@ -4,21 +4,27 @@ import EmptyState from "../components/EmptyState";
 import { CollectionsIcon, ArrowRightIcon } from "../components/icons";
 
 export default function CollectionsPage() {
-  const { quotes } = useQuotes();
+  const { meta } = useQuotes();
 
-  const grouped = new Map<string, typeof quotes>();
-  for (const q of quotes) {
-    for (const name of q.collections ?? []) {
-      if (!name.trim()) continue;
-      const list = grouped.get(name) ?? [];
-      list.push(q);
-      grouped.set(name, list);
-    }
+  if (!meta) {
+    return (
+      <div>
+        <header className="animate-rise">
+          <p className="eyebrow">Collections</p>
+          <h1 className="mt-2 font-serif text-[40px] leading-none tracking-tight text-ink sm:text-[46px]">
+            Collections
+          </h1>
+        </header>
+        <div className="card mt-10 flex items-center justify-center py-24">
+          <p className="font-serif text-xl text-ink-soft">
+            Gathering your threads…
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  const entries = [...grouped.entries()].sort((a, b) =>
-    a[0].localeCompare(b[0]),
-  );
+  const entries = meta.collections;
 
   return (
     <div>
@@ -37,38 +43,35 @@ export default function CollectionsPage() {
 
       {entries.length > 0 ? (
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2">
-          {entries.map(([name, list], i) => {
-            const first = list[0];
-            return (
-              <Link
-                key={name}
-                to={`/library?collection=${encodeURIComponent(name)}`}
-                className="card group flex flex-col p-7 transition-all duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[0_16px_44px_-20px_rgba(36,33,29,0.28)]"
-                style={{ animationDelay: `${i * 40}ms` }}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent-deep">
-                    <CollectionsIcon className="h-5 w-5" />
-                  </span>
-                  <span className="eyebrow">
-                    {list.length} {list.length === 1 ? "line" : "lines"}
-                  </span>
-                </div>
-                <h2 className="mt-5 font-serif text-[26px] tracking-tight text-ink">
-                  {name}
-                </h2>
-                {first && (
-                  <p className="mt-3 line-clamp-2 font-cormorant text-[18px] italic leading-relaxed text-ink-soft">
-                    “{first.text}”
-                  </p>
-                )}
-                <div className="mt-6 flex items-center gap-1.5 border-t border-border/80 pt-4 text-sm text-ink-soft transition group-hover:text-accent-deep">
-                  Open collection
-                  <ArrowRightIcon className="h-4 w-4" />
-                </div>
-              </Link>
-            );
-          })}
+          {entries.map((entry, i) => (
+            <Link
+              key={entry.name}
+              to={`/library?collection=${encodeURIComponent(entry.name)}`}
+              className="card group flex flex-col p-7 transition-all duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:shadow-[0_16px_44px_-20px_rgba(36,33,29,0.28)]"
+              style={{ animationDelay: `${i * 40}ms` }}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent-soft text-accent-deep">
+                  <CollectionsIcon className="h-5 w-5" />
+                </span>
+                <span className="eyebrow">
+                  {entry.count} {entry.count === 1 ? "line" : "lines"}
+                </span>
+              </div>
+              <h2 className="mt-5 font-serif text-[26px] tracking-tight text-ink">
+                {entry.name}
+              </h2>
+              {entry.preview && (
+                <p className="mt-3 line-clamp-2 font-cormorant text-[18px] italic leading-relaxed text-ink-soft">
+                  “{entry.preview}”
+                </p>
+              )}
+              <div className="mt-6 flex items-center gap-1.5 border-t border-border/80 pt-4 text-sm text-ink-soft transition group-hover:text-accent-deep">
+                Open collection
+                <ArrowRightIcon className="h-4 w-4" />
+              </div>
+            </Link>
+          ))}
         </div>
       ) : (
         <div className="mt-10">

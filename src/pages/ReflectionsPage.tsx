@@ -1,16 +1,51 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuotes } from "../store/quotes";
 import SourceChip from "../components/SourceChip";
 import EmptyState from "../components/EmptyState";
 import { ArrowRightIcon } from "../components/icons";
 import { formatShort } from "../utils/format";
+import type { Quote } from "../types";
 
 export default function ReflectionsPage() {
-  const { quotes } = useQuotes();
+  const { fetchQuotes } = useQuotes();
+  const [withReflection, setWithReflection] = useState<Quote[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const withReflection = quotes
-    .filter((q) => q.reflection?.trim())
-    .sort((a, b) => b.savedDate.localeCompare(a.savedDate));
+  useEffect(() => {
+    let active = true;
+    fetchQuotes({ sort: "recent", limit: 100 })
+      .then((res) => {
+        if (active) {
+          setWithReflection(res.items.filter((q) => q.reflection?.trim()));
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [fetchQuotes]);
+
+  if (loading) {
+    return (
+      <div>
+        <header className="animate-rise">
+          <p className="eyebrow">Reflections</p>
+          <h1 className="mt-2 font-serif text-[40px] leading-none tracking-tight text-ink sm:text-[46px]">
+            Reflections
+          </h1>
+        </header>
+        <div className="card mt-10 flex items-center justify-center py-24">
+          <p className="font-serif text-xl text-ink-soft">
+            Gathering your notes…
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

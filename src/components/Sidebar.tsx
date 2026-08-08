@@ -5,7 +5,7 @@ import { NAV_ITEMS } from "./nav";
 import { MoonIcon, PlusIcon, SunIcon } from "./icons";
 
 export default function Sidebar() {
-  const { quotes } = useQuotes();
+  const { stats } = useQuotes();
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
 
@@ -83,7 +83,9 @@ export default function Sidebar() {
           />
         </button>
         <p className="px-3.5 pt-3 text-xs leading-relaxed text-ink-faint">
-          <span className="font-serif text-base text-ink">{quotes.length}</span>{" "}
+          <span className="font-serif text-base text-ink">
+            {stats?.total ?? 0}
+          </span>{" "}
           lines kept
         </p>
         <p className="mt-0.5 px-3.5 text-[11px] text-ink-faint">

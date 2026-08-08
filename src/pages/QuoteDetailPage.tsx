@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { toPng } from "html-to-image";
 import { useQuotes } from "../store/quotes";
@@ -18,41 +18,78 @@ import {
   XIcon,
 } from "../components/icons";
 import { countWords, formatDate, slugify } from "../utils/format";
+import type { Quote, QuoteContextInfo } from "../types";
 
 export default function QuoteDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const {
-    quotes,
     getQuote,
+    getQuoteContext,
+    fetchQuotes,
     toggleCollected,
     toggleFavorite,
     deleteQuote,
     setCollections,
     touchQuote,
   } = useQuotes();
+  const [quote, setQuote] = useState<Quote | null | undefined>(undefined);
+  const [context, setContext] = useState<QuoteContextInfo | null>(null);
+  const [related, setRelated] = useState<Quote[]>([]);
   const [exporting, setExporting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [collectionInput, setCollectionInput] = useState("");
   const exportRef = useRef<HTMLDivElement>(null);
   const touchedRef = useRef<string | null>(null);
 
-  const ordered = useMemo(
-    () => [...quotes].sort((a, b) => b.savedDate.localeCompare(a.savedDate)),
-    [quotes],
-  );
-  const index = ordered.findIndex((q) => q.id === id);
-  const quote = index >= 0 ? ordered[index] : id ? getQuote(id) : undefined;
-  const prev = index > 0 ? ordered[index - 1] : undefined;
-  const next = index >= 0 && index < ordered.length - 1 ? ordered[index + 1] : undefined;
-  const total = ordered.length;
-  const position = index >= 0 ? index + 1 : 0;
+  useEffect(() => {
+    if (!id) return;
+    let active = true;
+    setQuote(undefined);
+    setContext(null);
+    setRelated([]);
+
+    getQuote(id)
+      .then((q) => {
+        if (!active) return;
+        if (!q) {
+          setQuote(null);
+          return;
+        }
+        setQuote(q);
+        const first = (q.collections ?? [])[0];
+        if (!first) return;
+        fetchQuotes({ collection: first, sort: "recent", limit: 12 })
+          .then((res) => {
+            if (active) setRelated(res.items.filter((r) => r.id !== q.id));
+          })
+          .catch(() => {});
+      })
+      .catch(() => {
+        if (active) setQuote(null);
+      });
+
+    getQuoteContext(id)
+      .then((c) => {
+        if (active) setContext(c);
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
+  }, [id, getQuote, getQuoteContext, fetchQuotes]);
 
   useEffect(() => {
     if (!id || touchedRef.current === id) return;
     touchedRef.current = id;
     touchQuote(id).catch(() => {});
   }, [id, touchQuote]);
+
+  const prev = context?.prevId ? { id: context.prevId } : undefined;
+  const next = context?.nextId ? { id: context.nextId } : undefined;
+  const position = context?.position ?? 0;
+  const total = context?.total ?? 0;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -75,7 +112,7 @@ export default function QuoteDetailPage() {
 
   const handleExport = async () => {
     const node = exportRef.current;
-    if (!node || exporting) return;
+    if (!node || exporting || !quote) return;
     setExporting(true);
     try {
       await document.fonts?.ready;
@@ -109,16 +146,43 @@ export default function QuoteDetailPage() {
     }
   };
 
+  const handleToggleFavorite = async () => {
+    if (!quote) return;
+    const prevQuote = quote;
+    setQuote({ ...quote, favorite: !quote.favorite });
+    try {
+      await toggleFavorite(quote.id);
+    } catch (err) {
+      setQuote(prevQuote);
+      console.error("Failed to toggle favorite", err);
+    }
+  };
+
+  const handleToggleCollected = async () => {
+    if (!quote) return;
+    const prevQuote = quote;
+    setQuote({ ...quote, collected: !quote.collected });
+    try {
+      await toggleCollected(quote.id);
+    } catch (err) {
+      setQuote(prevQuote);
+      console.error("Failed to toggle collect", err);
+    }
+  };
+
   const addCollection = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!quote) return;
     const clean = collectionInput.trim();
     if (!clean) return;
     const next = Array.from(new Set([...(quote.collections ?? []), clean]));
+    const prevQuote = quote;
     setCollectionInput("");
+    setQuote({ ...quote, collections: next });
     try {
       await setCollections(quote.id, next);
     } catch (err) {
+      setQuote(prevQuote);
       console.error("Failed to update collections", err);
     }
   };
@@ -126,23 +190,41 @@ export default function QuoteDetailPage() {
   const removeCollection = async (name: string) => {
     if (!quote) return;
     const next = (quote.collections ?? []).filter((c) => c !== name);
+    const prevQuote = quote;
+    setQuote({ ...quote, collections: next });
     try {
       await setCollections(quote.id, next);
     } catch (err) {
+      setQuote(prevQuote);
       console.error("Failed to update collections", err);
     }
   };
 
-  if (!quote) {
+  const backButton = (
+    <button
+      type="button"
+      onClick={() => navigate(-1)}
+      className="mb-8 inline-flex items-center gap-2 text-sm text-ink-soft transition hover:text-ink"
+    >
+      <ArrowLeftIcon className="h-4 w-4" /> Back
+    </button>
+  );
+
+  if (quote === undefined) {
     return (
       <div>
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="mb-8 inline-flex items-center gap-2 text-sm text-ink-soft transition hover:text-ink"
-        >
-          <ArrowLeftIcon className="h-4 w-4" /> Back
-        </button>
+        {backButton}
+        <div className="flex items-center justify-center py-24">
+          <p className="font-serif text-lg text-ink-soft">Lifting this line…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (quote === null) {
+    return (
+      <div>
+        {backButton}
         <EmptyState
           title="This line has drifted away."
           body="It may have been removed, or the link is no longer valid."
@@ -155,14 +237,8 @@ export default function QuoteDetailPage() {
 
   const favorite = !!quote.favorite;
   const collected = !!quote.collected;
-  const related = quote.collections?.length
-    ? quotes.filter(
-        (q) =>
-          q.id !== quote.id &&
-          (q.collections ?? []).some((c) => quote.collections!.includes(c)),
-      )
-    : [];
   const words = countWords(quote.text);
+  const relatedCount = related.length;
 
   return (
     <div>
@@ -187,11 +263,7 @@ export default function QuoteDetailPage() {
           </button>
           <button
             type="button"
-            onClick={() => {
-              toggleFavorite(quote.id).catch((err) =>
-                console.error("Failed to toggle favorite", err),
-              );
-            }}
+            onClick={handleToggleFavorite}
             className={`btn-ghost ${favorite ? "border-accent! text-accent-deep!" : ""}`}
           >
             <HeartIcon
@@ -208,11 +280,7 @@ export default function QuoteDetailPage() {
 
           <button
             type="button"
-            onClick={() => {
-              toggleCollected(quote.id).catch((err) =>
-                console.error("Failed to toggle collect", err),
-              );
-            }}
+            onClick={handleToggleCollected}
             className={`btn-ghost ${collected ? "border-accent! text-accent-deep!" : ""}`}
           >
             <BookmarkIcon
@@ -417,8 +485,8 @@ export default function QuoteDetailPage() {
                 From the same collections
               </h2>
               <p className="mt-1 text-[13px] text-ink-faint">
-                {(quote.collections ?? []).join(" · ")} — {related.length} more{" "}
-                {related.length === 1 ? "line" : "lines"}
+                {(quote.collections ?? []).join(" · ")} — {relatedCount} more{" "}
+                {relatedCount === 1 ? "line" : "lines"}
               </p>
             </div>
             <Link
