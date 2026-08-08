@@ -13,7 +13,7 @@ function MobileTopBar() {
       <div className="flex items-center justify-between px-5 pb-2 pt-4">
         <Link to="/" className="flex items-baseline gap-0.5">
           <span className="font-serif text-[24px] leading-none tracking-tight text-ink">
-            Margin
+            Maple
           </span>
           <span className="font-serif text-[24px] leading-none text-accent">.</span>
         </Link>

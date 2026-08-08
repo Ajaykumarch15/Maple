@@ -14,7 +14,7 @@ export default function Sidebar() {
       <div className="px-7 pb-6 pt-8">
         <Link to="/" className="flex items-baseline gap-0.5">
           <span className="font-serif text-[28px] leading-none tracking-tight text-ink">
-            Margin
+            Maple
           </span>
           <span className="font-serif text-[28px] leading-none text-accent">
             .

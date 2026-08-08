@@ -1,8 +1,8 @@
-# Margin
+# Maple
 
 A personal commonplace book — a quiet place to save the quotes, lines, and thoughts worth keeping, and to find them again.
 
-Built around the flow **Capture → Organize → Search → Filter → Read → Rediscover**, Margin is designed to stay calm and useful even with 1,000+ saved quotes.
+Built around the flow **Capture → Organize → Search → Filter → Read → Rediscover**, Maple is designed to stay calm and useful even with 1,000+ saved quotes.
 
 ## Features
 

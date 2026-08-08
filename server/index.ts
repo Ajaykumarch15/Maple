@@ -37,5 +37,5 @@ app.use(errorHandler);
 const port = Number(process.env.PORT ?? 4000);
 
 app.listen(port, () => {
-  console.log(`Margin API listening on http://localhost:${port}`);
+  console.log(`Maple API listening on http://localhost:${port}`);
 });

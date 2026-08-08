@@ -610,7 +610,7 @@ export default function QuoteDetailPage() {
               color: "#a69c8f",
             }}
           >
-            Saved in Margin
+            Saved in Maple
           </p>
         </div>
       </div>
