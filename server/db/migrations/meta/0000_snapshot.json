@@ -1,5 +1,5 @@
 {
-  "id": "df688012-c34f-47a3-bcd8-c6e48140f904",
+  "id": "440a84bd-9582-441b-9402-38b770033dcb",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -54,11 +54,12 @@
           "notNull": true,
           "default": "'{}'"
         },
-        "collection": {
-          "name": "collection",
-          "type": "text",
+        "collections": {
+          "name": "collections",
+          "type": "text[]",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": "'{}'"
         },
         "saved_date": {
           "name": "saved_date",
@@ -85,6 +86,19 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
+        },
+        "favorite": {
+          "name": "favorite",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "last_opened_at": {
+          "name": "last_opened_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
@@ -103,11 +117,11 @@
           "method": "gin",
           "with": {}
         },
-        "quotes_collection_idx": {
-          "name": "quotes_collection_idx",
+        "quotes_collections_idx": {
+          "name": "quotes_collections_idx",
           "columns": [
             {
-              "expression": "collection",
+              "expression": "collections",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -115,7 +129,7 @@
           ],
           "isUnique": false,
           "concurrently": false,
-          "method": "btree",
+          "method": "gin",
           "with": {}
         },
         "quotes_saved_date_idx": {
