@@ -21,7 +21,8 @@ interface QuotesContextValue {
 
 const QuotesContext = createContext<QuotesContextValue | null>(null);
 
-const API = "/api/quotes";
+const API_BASE = (import.meta.env.VITE_API_BASE || "/api").replace(/\/+$/, "");
+const API = `${API_BASE}/quotes`;
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(path, {

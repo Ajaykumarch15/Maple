@@ -6,11 +6,16 @@ import { QuotesProvider } from "./store/quotes";
 import { ThemeProvider } from "./theme";
 import "./index.css";
 
+const basename =
+  import.meta.env.BASE_URL === "/"
+    ? undefined
+    : import.meta.env.BASE_URL.replace(/\/+$/, "");
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeProvider>
       <QuotesProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={basename}>
           <App />
         </BrowserRouter>
       </QuotesProvider>
