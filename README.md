@@ -153,17 +153,29 @@ src/
   data/quotes.ts # Seed data source
 ```
 
-## Deployment (Render)
+## Deployment (Vercel)
 
-This app deploys as a **single Render web service** — the Express server serves both the API and the built frontend, so there is no CORS or proxy setup.
+This app deploys to **Vercel** as a single project — the Express API runs as a
+serverless function (`api/index.ts`) and Vercel serves the built frontend from
+`dist`. A rewrite sends `/api/*` to the function and every other route to
+`index.html` (SPA fallback), so the browser always talks to the same origin and
+there is no CORS or proxy setup.
 
 1. Push the repository to GitHub.
-2. On [render.com](https://dashboard.render.com): **New → Web Service** → connect the repo.
-3. Name: `margin`, Runtime: **Node**.
-4. Build command: `npm ci && npm run build`
-5. Start command: `npm run start`
-6. Add environment variable `DATABASE_URL` (your PostgreSQL connection string).
-7. Create the service. Every push to `main` auto-redeploys.
+2. On [vercel.com](https://vercel.com): **Add New → Project** → import the repo.
+3. Framework preset: **Vite** (build command `npm run build`, output `dist` are
+   set by `vercel.json`).
+4. Add the environment variable `DATABASE_URL` (your PostgreSQL connection
+   string).
+5. Deploy. Every push to `main` auto-redeploys.
+
+To verify locally, run the dev servers as described above and hit
+`/api/health`.
+
+> The previous setup used a single Render web service serving both the API and
+> the frontend. Render is no longer needed — remove that service once the Vercel
+> deployment is verified.
+
 
 ## License
 
