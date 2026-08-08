@@ -14,9 +14,9 @@ import {
   or,
   sql,
 } from "drizzle-orm";
-import { db } from "../db";
-import { quotes } from "../db/schema";
-import type { NewQuote } from "../db/schema";
+import { db } from "../db/index.js";
+import { quotes } from "../db/schema.js";
+import type { NewQuote } from "../db/schema.js";
 
 const router = Router();
 

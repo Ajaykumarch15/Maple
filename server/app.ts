@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import cors from "cors";
 import type { ErrorRequestHandler } from "express";
-import quotesRouter from "./routes/quotes";
+import quotesRouter from "./routes/quotes.js";
 
 const app = express();
 app.use(express.json());

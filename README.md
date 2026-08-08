@@ -169,6 +169,23 @@ npm run build    # type-checks (tsc) and builds the frontend
 then run the app with `npm run dev` and smoke-test the main flows: quote
 CRUD, search, filters, sorting, favorites, collections, and reading mode.
 
+## Deployment (Vercel)
+
+The app can deploy to Vercel as a single project. The Express API runs as a
+serverless function (`api/index.ts`) and Vercel serves the built frontend from
+`dist`. A rewrite in `vercel.json` sends `/api/*` to the function and every
+other route to `index.html` (SPA fallback), so the browser always talks to the
+same origin and there is no CORS setup.
+
+1. Push the repository to GitHub.
+2. On [vercel.com](https://vercel.com): **Add New → Project** → import the repo.
+3. Build command `npm run build` and output `dist` are set by `vercel.json`.
+4. Add the environment variable `DATABASE_URL` (your PostgreSQL connection
+   string).
+5. Deploy. Every push to `main` auto-redeploys.
+
+To deploy from the CLI instead, run `vercel login` once, then `vercel --prod`.
+
 ## License
 
 Private project — all rights reserved.

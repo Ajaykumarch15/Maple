@@ -1,8 +1,8 @@
 import "dotenv/config";
-import { db } from "./db";
-import { quotes } from "./db/schema";
-import { seedQuotes } from "../src/data/quotes";
-import type { NewQuote } from "./db/schema";
+import { db } from "./db/index.js";
+import { quotes } from "./db/schema.js";
+import { seedQuotes } from "../src/data/quotes.js";
+import type { NewQuote } from "./db/schema.js";
 
 const rows: NewQuote[] = seedQuotes.map((q) => ({
   text: q.text,
